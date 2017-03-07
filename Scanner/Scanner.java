@@ -144,7 +144,27 @@ public final class Scanner {
     }
     
     private int checkLiterals() {
-    	if current
+        // check for IDs
+        // has to start with letter or underscore
+        if (currentChar >= 'a' && currentChar <= 'z'
+                || currentChar >= 'A' && currentChar <= 'Z'
+                || currentChar == '_') {
+            accept();
+            while true {
+                // now numbers in ID are valid
+                if (currentChar >= 'a' && currentChar <= 'z'
+                        || currentChar >= 'A' && currentChar <= 'Z'
+                        || currentChar >= '0' && currentChar <= '9'
+                        || currentChar == '_') {
+                    accept();
+                } else {
+                    // we didn't find a valid char for ID, return
+                    return Token.ID;
+                }
+            }
+        } else if (currentChar >= '0' && currentChar <= '9' || currentChar == '.') {
+            if
+        }
     }
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
