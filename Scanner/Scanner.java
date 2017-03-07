@@ -54,96 +54,108 @@ public final class Scanner {
     private char inspectChar(int nthChar) {
         return sourceFile.inspectChar(nthChar);
     }
-
+    
+    private int checkSeperators() {
+        switch (currentChar) {
+        case '(':
+            accept();
+            return Token.LPAREN;
+        case ')':
+            accept();
+            return Token.RPAREN;
+        case '{':
+            accept();
+            return Token.LCURLY;
+        case '}':
+            accept();
+            return Token.RCURLY;
+        case '[':
+            accept();
+            return Token.LBRACKET;
+        case ']':
+            accept();
+            return Token.RBRACKET;
+    }
+        
+    private in checkOperators() {
+    	switch(currentChar) { 
+	    case '|':
+	        accept();
+	        if (currentChar == '|') {
+	            accept();
+	            return Token.OROR;
+	        } else {
+	            return Token.ERROR;
+	        }
+	    case '+':
+	        accept();
+	        return Token.PLUS;
+	    case '-':
+	        accept();
+	        return Token.MINUS;
+	    case '*':
+	        accept();
+	        return Token.MULT;
+	    case '/':
+	        accept();
+	        return Token.DIV;
+	    case '!':
+	        accept();
+	        if (currentChar == '=') {
+	            accept();
+	            return Token.NOTEQ;
+	        }
+	        else {
+	            return Token.NOT;
+	        }
+	    case '=':
+	        accept();
+	        if (currentChar == '=') {
+	            accept();
+	            return Token.EQEQ;
+	        } else {
+	            return Token.EQ;
+	        }
+	    case '<':
+	        accept();
+	        if (currentChar == "=") {
+	            accept();
+	            return Token.LTEQ;
+	        } else {
+	            return Token.LT;
+	        }
+	    case '>':
+	        accept();
+	        if (currentChar == '=') {
+	            accept();
+	            return Token.GTEQ;
+	        } else {
+	            return Token.GT;
+	        }
+	    case '&':
+	        accept();
+	        if (currentChar == '&') {
+	            accept();
+	            return Token.ANDAND;
+	        } else {
+	            return Token.ERROR;
+	        }
+    	}
+    }
+    
+    private int checkLiterals() {
+    	if current
+    }
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
 
-        switch (currentChar) {
-            // TODO: make function for checking separators
-            case '(':
-                accept();
-                return Token.LPAREN;
-            case ')':
-                accept();
-                return Token.RPAREN;
-            case '{':
-                accept();
-                return Token.LCURLY;
-            case '}':
-                accept();
-                return Token.RCURLY;
-            case '[':
-                accept();
-                return Token.LBRACKET;
-            case ']':
-                accept();
-                return Token.RBRACKET;
+
 
             // TODO: make fucntion for chekcing flaot (is there one in Token.java?)
             case '.':
                 //  attempting to recognise a float
 
-            case '|':
-                accept();
-                if (currentChar == '|') {
-                    accept();
-                    return Token.OROR;
-                } else {
-                    return Token.ERROR;
-                }
-            case '+':
-                accept();
-                return Token.PLUS;
-            case '-':
-                accept();
-                return Token.MINUS;
-            case '*':
-                accept();
-                return Token.MULT;
-            case '/':
-                accept();
-                return Token.DIV;
-            case '!':
-                accept();
-                if (currentChar == '=') {
-                    accept();
-                    return Token.NOTEQ;
-                }
-                else {
-                    return Token.NOT;
-                }
-            case '=':
-                accept();
-                if (currentChar == '=') {
-                    accept();
-                    return Token.EQEQ;
-                } else {
-                    return Token.EQ;
-                }
-            case '<':
-                accept();
-                if (currentChar == "=") {
-                    accept();
-                    return Token.LTEQ;
-                } else {
-                    return Token.LT;
-                }
-            case '>':
-                accept();
-                if (currentChar == '=') {
-                    accept();
-                    return Token.GTEQ;
-                } else {
-                    return Token.GT;
-                }
-            case '&':
-                accept();
-                if (currentChar == '&') {
-                    accept();
-                    return Token.ANDAND;
-                } else {
-                    return Token.ERROR;
-                }
+            
 
                 // ....
             case SourceFile.eof:
