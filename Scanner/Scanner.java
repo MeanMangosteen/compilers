@@ -143,27 +143,47 @@ public final class Scanner {
     	}
     }
     
-    private int checkLiterals() {
-        boolean isFloat = false;
+    private int checkIdentifiers() {
         // check for IDs
         // has to start with letter or underscore
         if (currentChar >= 'a' && currentChar <= 'z'
                 || currentChar >= 'A' && currentChar <= 'Z'
                 || currentChar == '_') {
             accept();
+            // TODO: add to spelling
             while true {
                 // now numbers in ID are valid
                 if (currentChar >= 'a' && currentChar <= 'z'
                         || currentChar >= 'A' && currentChar <= 'Z'
                         || currentChar >= '0' && currentChar <= '9'
                         || currentChar == '_') {
+                    // TODO: add to speeling
                     accept();
+                    // the identifier spells a boolean value, 
+                    if (currentSpelling.toString().equals("true") ||
+                            currentSpelling.toString().equals("false")) {
+                        return Token.ID;
+                    }
                 } else {
                     // we didn't find a valid char for ID, return
                     return Token.ID;
                 }
             }
-        // TODO: remember exponent can be after dot as well
+        }
+    }
+    
+    private int checkLiterals() {
+       // TODO: this is checking for ID's, it should be checking for string literials 
+        boolean isFloat = false;
+        if (currentChar == '"' ) {
+            accept();
+            // add to spelling until we find the terminting " keeping eating the chars
+            // TODO: handle escaping of quotation marks
+            while (currentChar != '"') {
+            // TODO: add the spelling 
+
+            }
+            return Token.STRINGLITERAL;
         } else {
             // check for all digits
             // check if any dot and any digits
@@ -214,18 +234,35 @@ public final class Scanner {
                 return Token.INTLITERAL;
             }
     }
+    
+    private enum Tokens {
+            SEPERATORS, OPERATORS, LITERALS,
+            IDENTIFIERS, KEYWORDS
+    }
+
+    private int tokenChecker(int tokenType) {
+        if (tokenType == Tokens.SEPERATORS) {
+            return checkSeperators();
+        } else if (tokenType == Tokens.OPERATORS) {
+            return checkOperators();
+        } else if (tokenType == Tokens.LITERALS) {
+            return checkLiterals();
+        } else if (tokenType == Tokens.IDENTIFIERS) {
+            return checkIdentifiers();
+        } else if (tokenType == Tokens.KEYWORDS) {
+            return checkIdentifiers();
+        } else {
+            throw Exception("tokenChecker: invalid token type");
+    }
+
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
-
-
-
-            // TODO: make fucntion for chekcing flaot (is there one in Token.java?)
-            case '.':
-                //  attempting to recognise a float
-
+            int tokenID = -1;
+            tokenID = checkSeperators();
+            if (tokenID >= 0) {
+                return tokenID;
             
 
-                // ....
             case SourceFile.eof:
                 currentSpelling.append(Token.spell(Token.EOF));
                 return Token.EOF;
