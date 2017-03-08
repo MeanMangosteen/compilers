@@ -162,9 +162,41 @@ public final class Scanner {
                     return Token.ID;
                 }
             }
-        } else if (currentChar >= '0' && currentChar <= '9' || currentChar == '.') {
-            if
-        }
+        // TODO: remember exponent can be after dot as well
+        } else if (currentChar >= '0' && currentChar <= '9') {
+            // checking for int or float literals
+            accept();
+            if (currentChar == '.') {
+                // it must be a float
+                accept();
+                while (true) {
+                    // find all digits after dot
+                    if (currentChar >= '0' && currentChar <= '9') {
+                        accept();
+                    } else {
+                        // not a digiti return
+                        return Token.FLOATLITERAL;
+                    }
+            } else if (currentChar == 'e' || currentChar == 'E') {
+               // found exponent, must be a float
+               accept()
+                    // find all digits after dot
+                    if (currentChar >= '0' && currentChar <= '9') {
+                        accept();
+                        while (true) {
+                            if (currentChar >= '0' && currentChar <= '9') {
+                                accept();
+                            } else {
+                                // not a digiti return
+                                return Token.FLOATLITERAL;
+                            }
+                        }
+                    } else {
+                        // there must be a digit after exponent
+                        return Token.ERROR;
+                }
+            } else {
+                return Token.INTLITERAL;
     }
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
