@@ -75,9 +75,13 @@ public final class Scanner {
         case ']':
             accept();
             return Token.RBRACKET;
+	default:
+	    System.out.println("checkSeperators: recieved invalid token type");
+	    return -1;
+        }
     }
         
-    private in checkOperators() {
+    private int checkOperators() {
     	switch(currentChar) { 
 	    case '|':
 	        accept();
@@ -118,7 +122,7 @@ public final class Scanner {
 	        }
 	    case '<':
 	        accept();
-	        if (currentChar == "=") {
+	        if (currentChar == '=') {
 	            accept();
 	            return Token.LTEQ;
 	        } else {
@@ -140,6 +144,9 @@ public final class Scanner {
 	        } else {
 	            return Token.ERROR;
 	        }
+	   default:
+		System.out.println("checkOperators: received invalid token type");
+		return -1;
     	}
     }
     
@@ -151,7 +158,7 @@ public final class Scanner {
                 || currentChar == '_') {
             accept();
             // TODO: add to spelling
-            while true {
+            while (true) {
                 // now numbers in ID are valid
                 if (currentChar >= 'a' && currentChar <= 'z'
                         || currentChar >= 'A' && currentChar <= 'Z'
@@ -169,20 +176,25 @@ public final class Scanner {
                     return Token.ID;
                 }
             }
-        }
+        } else {
+		System.out.println("checkIdentifers: received invalid token type");
+		return -1;
+	}
     }
     
     private int checkLiterals() {
        // TODO: this is checking for ID's, it should be checking for string literials 
         boolean isFloat = false;
+	boolean isInt = false;
         if (currentChar == '"' ) {
             accept();
             // add to spelling until we find the terminting " keeping eating the chars
             // TODO: handle escaping of quotation marks
             while (currentChar != '"') {
             // TODO: add the spelling 
-
+	    accept();
             }
+	    accept();
             return Token.STRINGLITERAL;
         } else {
             // check for all digits
@@ -191,6 +203,7 @@ public final class Scanner {
             while (currentChar >= '0' && currentChar <= '9') {
                 // checking for int or float literals
                 accept();
+		isInt = true;
                 // TODO: add to spelling 
             }
             if (currentChar == '.') {
@@ -204,13 +217,14 @@ public final class Scanner {
                         // TODO;add to spelling
                     } else {
                         isFloat = true;
+			isInt = false;
                         break;
                     }
                 }
             } 
             if (currentChar == 'e' || currentChar == 'E') {
                // found exponent, must be a float
-               accept()
+               accept();
                 // find all digits after dot
                 if (currentChar >= '0' && currentChar <= '9') {
                     accept();
@@ -220,6 +234,7 @@ public final class Scanner {
                             // TODO: add to spelling
                         } else {
                             isFloat = true;
+			    isInt = false;
                             break;
                         }
                     }
@@ -228,50 +243,64 @@ public final class Scanner {
                     return Token.ERROR;
                 }
             }
+	    // TODO: string literal should be here as well;
             if (isFloat) {
                 return Token.FLOATLITERAL;
-            else {
+            } else if(isInt) {
                 return Token.INTLITERAL;
-            }
+            } else {
+		System.out.println("checkLiterals: received invalid token type");
+	    	return -1;
+	    }
+        }
     }
+
+    // TODO: this should return an int
+    private void checkSpecial() {
+                
+        }
     
     private enum Tokens {
             SEPERATORS, OPERATORS, LITERALS,
             IDENTIFIERS, KEYWORDS
     }
 
-    private int tokenChecker(int tokenType) {
-        if (tokenType == Tokens.SEPERATORS) {
-            return checkSeperators();
-        } else if (tokenType == Tokens.OPERATORS) {
-            return checkOperators();
-        } else if (tokenType == Tokens.LITERALS) {
-            return checkLiterals();
-        } else if (tokenType == Tokens.IDENTIFIERS) {
-            return checkIdentifiers();
-        } else if (tokenType == Tokens.KEYWORDS) {
-            return checkIdentifiers();
-        } else {
-            throw Exception("tokenChecker: invalid token type");
+    private int tokenChecker(Tokens tokenType) {
+    	switch (tokenType) {
+	case SEPERATORS:
+		return checkSeperators();
+	case OPERATORS: 
+		return checkOperators();
+	case LITERALS:
+		return checkLiterals();
+	case IDENTIFIERS:
+		return checkIdentifiers();
+	case KEYWORDS:
+		return checkIdentifiers();
+	default:
+		// TODO: remofe this
+		System.out.println("tokenChecker: invalid token type");
+		return Token.ERROR;
+	}
     }
 
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
             int tokenID = -1;
-            tokenID = checkSeperators();
+        for (Tokens tokenType: Tokens.values()) {
+            tokenID = tokenChecker(tokenType);
             if (tokenID >= 0) {
                 return tokenID;
-            
-
-            case SourceFile.eof:
+            }
+        }
+	// TODO: remove this
+	System.out.println("nextToken: error in identifying token");
+	return -1;
+            /*case SourceFile.eof:
                 currentSpelling.append(Token.spell(Token.EOF));
                 return Token.EOF;
             default:
-                break;
-        }
-
-        accept();
-        return Token.ERROR;
+                break;*/
     }
 
     void skipSpaceAndComments() {
