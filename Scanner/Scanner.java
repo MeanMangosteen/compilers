@@ -144,6 +144,7 @@ public final class Scanner {
     }
     
     private int checkLiterals() {
+        boolean isFloat = false;
         // check for IDs
         // has to start with letter or underscore
         if (currentChar >= 'a' && currentChar <= 'z'
@@ -163,40 +164,55 @@ public final class Scanner {
                 }
             }
         // TODO: remember exponent can be after dot as well
-        } else if (currentChar >= '0' && currentChar <= '9') {
-            // checking for int or float literals
-            accept();
+        } else {
+            // check for all digits
+            // check if any dot and any digits
+            // check for exp and any digits
+            while (currentChar >= '0' && currentChar <= '9') {
+                // checking for int or float literals
+                accept();
+                // TODO: add to spelling 
+            }
             if (currentChar == '.') {
                 // it must be a float
                 accept();
                 while (true) {
+                    // TODO: integrate 'if' into 'while'
                     // find all digits after dot
                     if (currentChar >= '0' && currentChar <= '9') {
                         accept();
+                        // TODO;add to spelling
                     } else {
-                        // not a digiti return
-                        return Token.FLOATLITERAL;
+                        isFloat = true;
+                        break;
                     }
-            } else if (currentChar == 'e' || currentChar == 'E') {
+                }
+            } 
+            if (currentChar == 'e' || currentChar == 'E') {
                // found exponent, must be a float
                accept()
-                    // find all digits after dot
-                    if (currentChar >= '0' && currentChar <= '9') {
-                        accept();
-                        while (true) {
-                            if (currentChar >= '0' && currentChar <= '9') {
-                                accept();
-                            } else {
-                                // not a digiti return
-                                return Token.FLOATLITERAL;
-                            }
+                // find all digits after dot
+                if (currentChar >= '0' && currentChar <= '9') {
+                    accept();
+                    while (true) {
+                        if (currentChar >= '0' && currentChar <= '9') {
+                            accept();
+                            // TODO: add to spelling
+                        } else {
+                            isFloat = true;
+                            break;
                         }
-                    } else {
-                        // there must be a digit after exponent
-                        return Token.ERROR;
+                    }
+                } else {
+                    // there must be a digit after exponent
+                    return Token.ERROR;
                 }
-            } else {
+            }
+            if (isFloat) {
+                return Token.FLOATLITERAL;
+            else {
                 return Token.INTLITERAL;
+            }
     }
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
@@ -253,3 +269,9 @@ public final class Scanner {
     }
 
 }
+
+// QUESTION:
+// To what extent do we remove all whitespace?
+//      if we have the int 33 and the float 4.4
+//      and we remove white space to become 334.4
+//      how do we now recognize these as two tokens.
