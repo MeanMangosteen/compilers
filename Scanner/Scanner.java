@@ -297,6 +297,10 @@ public final class Scanner {
 	System.out.println("nextToken: error in identifying token");
 	return -1;
             /*case SourceFile.eof:
+=======
+
+            case SourceFile.eof:
+>>>>>>> 72ae9d7913625bf0971709a0b36ac8ed30be3374
                 currentSpelling.append(Token.spell(Token.EOF));
                 return Token.EOF;
             default:
