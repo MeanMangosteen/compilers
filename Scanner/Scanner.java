@@ -234,6 +234,10 @@ public final class Scanner {
                 return Token.INTLITERAL;
             }
     }
+
+    private int checkSpecial() {
+
+        }
     
     private enum Tokens {
             SEPERATORS, OPERATORS, LITERALS,
@@ -258,10 +262,12 @@ public final class Scanner {
     private int nextToken() {
         // Tokens: separators, operators, literals, identifiers and keyworods
             int tokenID = -1;
-            tokenID = checkSeperators();
+        for (int tokenType: Tokens.values()) {
+            tokenID = tokenChecker(tokenType);
             if (tokenID >= 0) {
                 return tokenID;
-            
+            }
+        }
 
             case SourceFile.eof:
                 currentSpelling.append(Token.spell(Token.EOF));
