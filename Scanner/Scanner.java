@@ -36,6 +36,7 @@ public final class Scanner {
     private void accept() {
 
         currentChar = sourceFile.getNextChar();
+        System.out.println("accept(): the curr char is now " + currentChar);
 
         // you may save the lexeme of the current token incrementally here
         // you may also increment your line and column counters here
@@ -64,7 +65,6 @@ public final class Scanner {
             accept();
             return Token.RPAREN;
         case '{':
-            accept();
             return Token.LCURLY;
         case '}':
             accept();
@@ -185,16 +185,17 @@ public final class Scanner {
     private int checkLiterals() {
        // TODO: this is checking for ID's, it should be checking for string literials 
         boolean isFloat = false;
-	boolean isInt = false;
+        boolean isInt = false;
         if (currentChar == '"' ) {
             accept();
             // add to spelling until we find the terminting " keeping eating the chars
             // TODO: handle escaping of quotation marks
             while (currentChar != '"') {
             // TODO: add the spelling 
-	    accept();
+                accept();
             }
-	    accept();
+            System.out.println("checkLiterals: we've hit the end of a string and now returning");
+            accept();
             return Token.STRINGLITERAL;
         } else {
             // check for all digits
@@ -256,7 +257,12 @@ public final class Scanner {
     }
 
     // TODO: this should return an int
-    private void checkSpecial() {
+    private int checkSpecial() {
+            if (currentChar == SourceFile.eof) {
+                return Token.EOF;
+            } else {
+                return -1;
+            }
                 
         }
     
@@ -308,11 +314,48 @@ public final class Scanner {
     }
 
     void skipSpaceAndComments() {
+        // skipping comments
+        if (currentChar == '/') {
+            if (inspectChar(1) == '/') {
+                System.out.println("skipSpaceAndComents: comment detected"); 
+                // if we find '//' remove all chars until we hit LF or CR
+                while (currentChar != '\n' || currentChar != '\r') {
+                    accept();
+                }
+                if (currentChar == '\r' && inspectChar(1) == '\n') {
+                    // if CRLF then remove both
+                    accept();
+                    accept();
+                } else {
+                    // if either only CR or LF remove one char
+                    accept();
+                }
+            }
+        } else if (currentChar == '\n' || currentChar == '\r') {
+            System.out.println("skipSpaceAndComents: there line terminator detected");
+            // if the current token is a line terminator remove it
+            if (currentChar == '\n' && inspectChar(1) == '\r') {
+                System.out.println("skipSpaceAndComents: CRLF detected");
+                // if CRLF then remove both
+                accept();
+                accept();
+            } else {
+                System.out.println("skipSpaceAndComents: either CR or LF detected");
+                // if either only CR or LF remove one char
+                // TODO: I have no idea why I need two accepts here
+                accept();
+                accept();
+            }
+        }
+        // removing line terminators
+
     }
 
     public Token getToken() {
         Token tok;
         int kind;
+
+        System.out.println("getToken: getting new token");
 
         // skip white space and comments
 
