@@ -333,7 +333,7 @@ public final class Scanner {
             if (inspectChar(1) == '/') {
                 System.out.println("skipSpaceAndComents: comment detected"); 
                 // if we find '//' remove all chars until we hit LF or CR
-                while (currentChar != '\n' || currentChar != '\r') {
+                while (currentChar != '\n' && currentChar != '\r') {
                     accept();
                 }
                 if (currentChar == '\r' && inspectChar(1) == '\n') {
