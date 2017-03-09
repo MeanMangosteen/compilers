@@ -383,6 +383,11 @@ public final class Scanner {
 
     void skipSpaceAndComments() {
 	System.out.println("skipSpaceAndComments(): entered");
+	// skipping whitespace
+	if (Character.isWhitespace(currentChar)) {
+	    accept();
+	    skipSpaceAndComments();
+	}
         // skipping comments
         if (currentChar == '/') {
             if (inspectChar(1) == '/') {
@@ -416,7 +421,7 @@ public final class Scanner {
                 accept();
             }
 	    skipSpaceAndComments();
-        }
+        } 
         // removing line terminators
     }
 
