@@ -245,11 +245,32 @@ public final class Scanner {
 		}
 	}
 
+	private boolean charIncoming(List<char> chars) {
+		int pos = 1;
+		// for each chars in list, check if it
+		// exists in line, and check all subsequent
+		// char follow one after the other as well
+		for (char ch: chars) {
+			while (true) {
+				if (inspectChar(pos) != '\n' || inspectChar(pos) != '\r') {
+					return false;
+				}
+				pos++;
+				if (inspectChar(pos) == ch) {
+					break;
+				}
+			}
+		}
+		// if execution reaches here, all matches were found
+		return true;
+	}
 	private int checkLiterals() {
+		//TODO: boolean literals
 		System.out.println("checkLiterals(): entered");
 		// TODO: this is checking for ID's, it should be checking for string literials 
 		boolean isFloat = false;
 		boolean isInt = false;
+		int retVal = -1;
 		if (currentChar == '"' ) {
 			accept();
 			currentSpelling.append(currentChar);
@@ -269,7 +290,43 @@ public final class Scanner {
 			accept();
 			System.out.println("checkLiterals: we've hit the end of a string and now returning");
 			return Token.STRINGLITERAL;
-		} else {
+		} else if (currentChar >= '0' && currentChar <= '9') {
+			retVal = Token.INT;
+			currentSpelling.append(currentChar);
+			accept();
+			while (currentChar >= '0' && currentChar <= '9') {
+				currentSpelling.append(currentChar);
+				accept();
+			}
+		}
+		if (currentChar == '.') {
+			// look ahead one char, if number accept and add to spelling
+			while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+				accept();
+				currentSpelling.append(currentChar);
+				retVal = Token.FLOAT;
+				pos++;
+			}
+		}
+		if (currentChar == 'e' || currentChar == 'E') {
+			// look ahead one char, if number accept and add to spelling
+			while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+				accept();
+				currentSpelling.append(currentChar);
+				retVal = Token.FLOAT;
+				pos++;
+			}
+
+		}
+
+		if (retVal < 0) {
+			System.out.println("checkLiterals: received invalid token type");
+		}
+		return retVal
+			// first check for ints adding to the spelling, retVal=INT
+			// if dot or 'e/E' and digits after, valid add to spelling, retVal=FLOAT
+			// we can make them independnet if's, 
+		{
 			// check for all digits
 			// check if any dot and any digits
 			// check for exp and any digits
