@@ -328,6 +328,7 @@ public final class Scanner {
     }
 
     void skipSpaceAndComments() {
+	System.out.println("skipSpaceAndComments(): entered");
         // skipping comments
         if (currentChar == '/') {
             if (inspectChar(1) == '/') {
@@ -344,6 +345,7 @@ public final class Scanner {
                     // if either only CR or LF remove one char
                     accept();
                 }
+	    skipSpaceAndComments();
             }
         } else if (currentChar == '\n' || currentChar == '\r') {
             System.out.println("skipSpaceAndComents: there line terminator detected");
@@ -359,9 +361,9 @@ public final class Scanner {
                 // TODO: I have no idea why I need two accepts here
                 accept();
             }
+	    skipSpaceAndComments();
         }
         // removing line terminators
-
     }
 
     public Token getToken() {
