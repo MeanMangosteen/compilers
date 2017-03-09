@@ -36,7 +36,13 @@ public final class Scanner {
     private void accept() {
 
         currentChar = sourceFile.getNextChar();
-        System.out.println("accept(): the curr char is now " + currentChar);
+        if (currentChar == '\n') {
+            System.out.println("the current char is the linefeed character");
+        } else if (currentChar == '\r') {
+            System.out.println("the current char is the carridge return character");
+        } else {
+            System.out.println("accept(): the curr char is now " + currentChar);
+        }
 
         // you may save the lexeme of the current token incrementally here
         // you may also increment your line and column counters here
@@ -57,6 +63,7 @@ public final class Scanner {
     }
     
     private int checkSeperators() {
+        System.out.println("checkSeperators(): entered");
         switch (currentChar) {
         case '(':
             accept();
@@ -82,6 +89,7 @@ public final class Scanner {
     }
         
     private int checkOperators() {
+        System.out.println("checkOperators(): entered");
     	switch(currentChar) { 
 	    case '|':
 	        accept();
@@ -151,6 +159,7 @@ public final class Scanner {
     }
     
     private int checkIdentifiers() {
+        System.out.println("checkIdentifiers(): entered");
         // check for IDs
         // has to start with letter or underscore
         if (currentChar >= 'a' && currentChar <= 'z'
@@ -177,12 +186,13 @@ public final class Scanner {
                 }
             }
         } else {
-		System.out.println("checkIdentifers: received invalid token type");
-		return -1;
-	}
+            System.out.println("checkIdentifers: received invalid token type");
+            return -1;
+        }
     }
     
     private int checkLiterals() {
+        System.out.println("checkLiterals(): entered");
        // TODO: this is checking for ID's, it should be checking for string literials 
         boolean isFloat = false;
         boolean isInt = false;
@@ -194,8 +204,8 @@ public final class Scanner {
             // TODO: add the spelling 
                 accept();
             }
-            System.out.println("checkLiterals: we've hit the end of a string and now returning");
             accept();
+            System.out.println("checkLiterals: we've hit the end of a string and now returning");
             return Token.STRINGLITERAL;
         } else {
             // check for all digits
@@ -250,17 +260,19 @@ public final class Scanner {
             } else if(isInt) {
                 return Token.INTLITERAL;
             } else {
-		System.out.println("checkLiterals: received invalid token type");
-	    	return -1;
-	    }
+                System.out.println("checkLiterals: received invalid token type");
+                return -1;
+            }
         }
     }
 
     // TODO: this should return an int
     private int checkSpecial() {
+        System.out.println("checkSpecial(): entered");
             if (currentChar == SourceFile.eof) {
                 return Token.EOF;
             } else {
+                System.out.println("checkSpecial: received invalid token type");
                 return -1;
             }
                 
@@ -268,7 +280,7 @@ public final class Scanner {
     
     private enum Tokens {
             SEPERATORS, OPERATORS, LITERALS,
-            IDENTIFIERS, KEYWORDS
+            IDENTIFIERS, KEYWORDS, SPECIAL
     }
 
     private int tokenChecker(Tokens tokenType) {
@@ -283,6 +295,8 @@ public final class Scanner {
 		return checkIdentifiers();
 	case KEYWORDS:
 		return checkIdentifiers();
+    case SPECIAL:
+        return checkSpecial();
 	default:
 		// TODO: remofe this
 		System.out.println("tokenChecker: invalid token type");
@@ -334,7 +348,7 @@ public final class Scanner {
         } else if (currentChar == '\n' || currentChar == '\r') {
             System.out.println("skipSpaceAndComents: there line terminator detected");
             // if the current token is a line terminator remove it
-            if (currentChar == '\n' && inspectChar(1) == '\r') {
+            if (currentChar == '\r' && inspectChar(1) == '\n') {
                 System.out.println("skipSpaceAndComents: CRLF detected");
                 // if CRLF then remove both
                 accept();
@@ -343,7 +357,6 @@ public final class Scanner {
                 System.out.println("skipSpaceAndComents: either CR or LF detected");
                 // if either only CR or LF remove one char
                 // TODO: I have no idea why I need two accepts here
-                accept();
                 accept();
             }
         }
