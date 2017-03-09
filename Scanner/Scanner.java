@@ -245,25 +245,6 @@ public final class Scanner {
 		}
 	}
 
-	private boolean charIncoming(List<char> chars) {
-		int pos = 1;
-		// for each chars in list, check if it
-		// exists in line, and check all subsequent
-		// char follow one after the other as well
-		for (char ch: chars) {
-			while (true) {
-				if (inspectChar(pos) != '\n' || inspectChar(pos) != '\r') {
-					return false;
-				}
-				pos++;
-				if (inspectChar(pos) == ch) {
-					break;
-				}
-			}
-		}
-		// if execution reaches here, all matches were found
-		return true;
-	}
 	private int checkLiterals() {
 		//TODO: boolean literals
 		System.out.println("checkLiterals(): entered");
@@ -300,89 +281,39 @@ public final class Scanner {
 			}
 		}
 		if (currentChar == '.') {
-			// look ahead one char, if number accept and add to spelling
-			while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
-				accept();
+			if (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
 				currentSpelling.append(currentChar);
-				retVal = Token.FLOAT;
-				pos++;
+				// look ahead one char, if number accept and add to spelling
+				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+					accept();
+					currentSpelling.append(currentChar);
+					retVal = Token.FLOAT;
+				}
+				// accept, otherwise we'll get duplicate reading
+				accept();
 			}
 		}
 		if (currentChar == 'e' || currentChar == 'E') {
-			// look ahead one char, if number accept and add to spelling
-			while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
-				accept();
+			if (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
 				currentSpelling.append(currentChar);
-				retVal = Token.FLOAT;
-				pos++;
+				// look ahead one char, if number accept and add to spelling
+				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+					accept();
+					currentSpelling.append(currentChar);
+					retVal = Token.FLOAT;
+				}
+				// accept, otherwise we'll get duplicate reading
+				accept();
 			}
-
 		}
 
 		if (retVal < 0) {
 			System.out.println("checkLiterals: received invalid token type");
 		}
-		return retVal
+		return retVal;
 			// first check for ints adding to the spelling, retVal=INT
 			// if dot or 'e/E' and digits after, valid add to spelling, retVal=FLOAT
 			// we can make them independnet if's, 
-		{
-			// check for all digits
-			// check if any dot and any digits
-			// check for exp and any digits
-			while (currentChar >= '0' && currentChar <= '9') {
-				// checking for int or float literals
-				accept();
-				isInt = true;
-				// TODO: add to spelling 
-			}
-			if (currentChar == '.') {
-				// it must be a float
-				accept();
-				while (true) {
-					// TODO: integrate 'if' into 'while'
-					// find all digits after dot
-					if (currentChar >= '0' && currentChar <= '9') {
-						accept();
-						// TODO;add to spelling
-					} else {
-						isFloat = true;
-						isInt = false;
-						break;
-					}
-				}
-			} 
-			if (currentChar == 'e' || currentChar == 'E') {
-				// found exponent, must be a float
-				accept();
-				// find all digits after dot
-				if (currentChar >= '0' && currentChar <= '9') {
-					accept();
-					while (true) {
-						if (currentChar >= '0' && currentChar <= '9') {
-							accept();
-							// TODO: add to spelling
-						} else {
-							isFloat = true;
-							isInt = false;
-							break;
-						}
-					}
-				} else {
-					// there must be a digit after exponent
-					return Token.ERROR;
-				}
-			}
-			// TODO: string literal should be here as well;
-			if (isFloat) {
-				return Token.FLOATLITERAL;
-			} else if(isInt) {
-				return Token.INTLITERAL;
-			} else {
-				System.out.println("checkLiterals: received invalid token type");
-				return -1;
-			}
-		}
 	}
 
 	// TODO: this should return an int
