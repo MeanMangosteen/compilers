@@ -7,6 +7,41 @@ package VC.Scanner;
 import VC.ErrorReporter;
 
 public final class Scanner {
+  private static String[] spellings = new String[] {
+    "boolean",
+    "break",
+    "continue",
+    "else",
+    "float",
+    "for",
+    "if",
+    "int",
+    "return",
+    "void",
+    "while",
+    "+",
+    "-",
+    "*",
+    "/",
+    "!",
+    "!=",
+    "=",
+    "==",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "&&",
+    "||",
+    "{",
+    "}",
+    "(",
+    ")",
+    "[",
+    "]",
+    ";",
+    ","
+  };
 
     private SourceFile sourceFile;
     private boolean debug;
@@ -63,29 +98,48 @@ public final class Scanner {
     }
     
     private int checkSeperators() {
+	int retVal = -1;
         System.out.println("checkSeperators(): entered");
         switch (currentChar) {
         case '(':
             accept();
-            return Token.LPAREN;
+            retVal = Token.LPAREN;
+	    break;
         case ')':
             accept();
-            return Token.RPAREN;
+            retVal = Token.RPAREN;
+	    break;
         case '{':
-            return Token.LCURLY;
+	    accept();
+            retVal = Token.LCURLY;
+	    break;
         case '}':
             accept();
-            return Token.RCURLY;
+            retVal = Token.RCURLY;
+	    break;
         case '[':
             accept();
-            return Token.LBRACKET;
+            retVal = Token.LBRACKET;
+	    break;
         case ']':
             accept();
-            return Token.RBRACKET;
+            retVal = Token.RBRACKET;
+	    break;
+        case ';':
+            accept();
+            retVal = Token.SEMICOLON;
+	    break;
+        case ',':
+            accept();
+            retVal = Token.COMMA;
+	    break;
 	default:
 	    System.out.println("checkSeperators: recieved invalid token type");
-	    return -1;
         }
+	if (retVal > 0) {
+	    currentSpelling.append(spellings[retVal]);
+	}
+	return retVal;
     }
         
     private int checkOperators() {
