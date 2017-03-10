@@ -41,24 +41,27 @@ public final class Scanner {
 	private void accept() {
 		currentChar = sourceFile.getNextChar();
 		if (Character.isWhitespace(currentChar)) {
-			sourcePos.charStart++;
 			sourcePos.charFinish++;
 		} else {
 			sourcePos.charFinish++;
 		}
-		System.out.println("accept(): charFinish is now: " + sourcePos.charFinish );
 		if (currentChar == '\n') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 			System.out.println("the current char is the linefeed character");
 			sourcePos.lineStart = sourcePos.lineFinish;
 			sourcePos.lineFinish++;
-			sourcePos.charStart = 0;
+			sourcePos.charStart = 1;
 			sourcePos.charFinish = 0;
 		} else if (currentChar == '\r') {
 			System.out.println("the current char is the carridge return character");
+		} else if (currentChar == SourceFile.eof) {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
 		} else {
 			System.out.println("accept(): the curr char is now " + currentChar);
 		}
+		System.out.println("accept(): lineFinish now: " + sourcePos.lineFinish);
+		System.out.println("accept(): charStart is now: " + sourcePos.charStart);
+		System.out.println("accept(): charFinish is now: " + sourcePos.charFinish );
 
 		// you may save the lexeme of the current token incrementally here
 		// you may also increment your line and column counters here
@@ -392,6 +395,9 @@ public final class Scanner {
 		for (Tokens tokenType: Tokens.values()) {
 			tokenID = tokenChecker(tokenType);
 			if (tokenID >= 0) {
+				if (currentChar != '\n' && currentChar != SourceFile.eof) {
+					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
+				}
 				return tokenID;
 			}
 		}
@@ -436,7 +442,7 @@ public final class Scanner {
 				while (currentChar != '\n' && currentChar != '\r') {
 					accept();
 				}
-                // we've hit the new line, now remove the newline
+				// we've hit the new line, now remove the newline
 				if (currentChar == '\r' && inspectChar(1) == '\n') {
 					// if CRLF then remove both
 					accept();
@@ -447,22 +453,22 @@ public final class Scanner {
 				}
 				skipSpaceAndComments();
 			} else if (inspectChar(1) == '*') {
-                // multiline comment
-                System.out.println("skipSpaceAndComments(): start of multiline string");
-                accept(); accept();
-                while (true) {
-                    if (currentChar == '*' && inspectChar(1) == '/') {
-                        System.out.println("skipSpaceAndComments(); end of multilin string");
-                        accept(); accept();
-                        skipSpaceAndComments();
-                        break;
-                    } else if (currentChar == SourceFile.eof) {
-                        errorReporter.reportError("Unterminated comment", "/**/", sourcePos);
-                        break;
-                    }
-                    accept();
-                }
-            }
+				// multiline comment
+				System.out.println("skipSpaceAndComments(): start of multiline string");
+				accept(); accept();
+				while (true) {
+					if (currentChar == '*' && inspectChar(1) == '/') {
+						System.out.println("skipSpaceAndComments(); end of multilin string");
+						accept(); accept();
+						skipSpaceAndComments();
+						break;
+					} else if (currentChar == SourceFile.eof) {
+						errorReporter.reportError("Unterminated comment", "/**/", sourcePos);
+						break;
+					}
+					accept();
+				}
+			}
 		} else if (currentChar == '\n' || currentChar == '\r') {
 			System.out.println("skipSpaceAndComents: there line terminator detected");
 			// if the current token is a line terminator remove it
@@ -491,12 +497,13 @@ public final class Scanner {
 
 		currentSpelling = new StringBuffer("");
 
-		sourcePos.charStart = sourcePos.charFinish;
+		skipSpaceAndComments();
+
+		sourcePos.charStart = sourcePos.charFinish ;
         
 	    errorReporter = new ErrorReporter();
 
 		// skip white space and comments
-		skipSpaceAndComments();
 
 		// You must record the position of the current token somehow
 
