@@ -143,73 +143,87 @@ public final class Scanner {
 	}
 
 	private int checkOperators() {
+		int retVal = -1;
+		// TODO: find a way to add spelling 
 		System.out.println("checkOperators(): entered");
 		switch(currentChar) { 
 			case '|':
-				accept();
-				if (currentChar == '|') {
+				if (inspectChar(1) == '|') {
+					// accept twice cos two characters
 					accept();
-					return Token.OROR;
-				} else {
-					return Token.ERROR;
+					accept();
+					retVal = Token.OROR;
 				}
+				break;
 			case '+':
 				accept();
-				return Token.PLUS;
+				retVal = Token.PLUS;
+				break;
 			case '-':
 				accept();
-				return Token.MINUS;
+				retVal = Token.MINUS;
+				break;
 			case '*':
 				accept();
-				return Token.MULT;
+				retVal = Token.MULT;
+				break;
 			case '/':
 				accept();
-				return Token.DIV;
+				retVal = Token.DIV;
+				break;
 			case '!':
-				accept();
-				if (currentChar == '=') {
-					accept();
-					return Token.NOTEQ;
+				if (inspectChar(1) == '=') {
+					accept(); accept();
+					retVal = Token.NOTEQ;
 				}
 				else {
-					return Token.NOT;
+					retVal = Token.NOT;
 				}
+				break;
 			case '=':
 				accept();
 				if (currentChar == '=') {
 					accept();
-					return Token.EQEQ;
+					retVal = Token.EQEQ;
 				} else {
-					return Token.EQ;
+					retVal = Token.EQ;
 				}
+				break;
 			case '<':
 				accept();
 				if (currentChar == '=') {
 					accept();
-					return Token.LTEQ;
+					retVal = Token.LTEQ;
 				} else {
-					return Token.LT;
+					retVal = Token.LT;
 				}
+				break;
 			case '>':
 				accept();
 				if (currentChar == '=') {
 					accept();
-					return Token.GTEQ;
+					retVal = Token.GTEQ;
 				} else {
-					return Token.GT;
+					retVal = Token.GT;
 				}
+				break;
 			case '&':
 				accept();
-				if (currentChar == '&') {
-					accept();
-					return Token.ANDAND;
-				} else {
-					return Token.ERROR;
+				if (inspectChar(1) == '&') {
+					accept(); accept();
+					retVal = Token.ANDAND;
 				}
+				break;
 			default:
 				System.out.println("checkOperators: received invalid token type");
-				return -1;
 		}
+		if (retVal < 0) {
+			// error add to spelling
+			currentSpelling.append(currentChar);
+		} else {
+			currentSpelling.append(Token.spell(retVal));
+		}
+		return retVal;
 	}
 
 	private int checkIdentifiers() {
@@ -272,7 +286,7 @@ public final class Scanner {
 			System.out.println("checkLiterals: we've hit the end of a string and now returning");
 			return Token.STRINGLITERAL;
 		} else if (currentChar >= '0' && currentChar <= '9') {
-			retVal = Token.INT;
+			retVal = Token.INTLITERAL;
 			currentSpelling.append(currentChar);
 			accept();
 			while (currentChar >= '0' && currentChar <= '9') {
@@ -287,7 +301,7 @@ public final class Scanner {
 				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
 					accept();
 					currentSpelling.append(currentChar);
-					retVal = Token.FLOAT;
+					retVal = Token.FLOATLITERAL;
 				}
 				// accept, otherwise we'll get duplicate reading
 				accept();
@@ -300,7 +314,7 @@ public final class Scanner {
 				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
 					accept();
 					currentSpelling.append(currentChar);
-					retVal = Token.FLOAT;
+					retVal = Token.FLOATLITERAL;
 				}
 				// accept, otherwise we'll get duplicate reading
 				accept();
@@ -348,9 +362,8 @@ public final class Scanner {
 			case SPECIAL:
 				return checkSpecial();
 			default:
-				// TODO: remofe this
 				System.out.println("tokenChecker: invalid token type");
-				return Token.ERROR;
+				return -1;
 		}
 	}
 
@@ -363,9 +376,11 @@ public final class Scanner {
 				return tokenID;
 			}
 		}
-		// TODO: remove this
 		System.out.println("nextToken: error in identifying token");
-		return -1;
+		// to flush the errenous curr char out
+		accept();
+		return Token.ERROR;
+		// TODO: remove this
 		/*case SourceFile.eof:
 		  =======
 
@@ -378,6 +393,7 @@ public final class Scanner {
 	}
 
 	void skipSpaceAndComments() {
+		// TODO: handle multiline comments
 		System.out.println("skipSpaceAndComments(): entered");
 		// skipping whitespace
 		if (Character.isWhitespace(currentChar)) {
@@ -385,7 +401,6 @@ public final class Scanner {
 			skipSpaceAndComments();
 		}
 		// skipping comments
-		// TODO: handle in-line comments 'int i = 0 //some comment'
 		if (currentChar == '/') {
 			if (inspectChar(1) == '/') {
 				System.out.println("skipSpaceAndComents: comment detected"); 
