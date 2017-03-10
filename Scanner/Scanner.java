@@ -5,6 +5,10 @@
 package VC.Scanner;
 
 import VC.ErrorReporter;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 public final class Scanner { 
 
 	private SourceFile sourceFile;
@@ -14,6 +18,7 @@ public final class Scanner {
 	private StringBuffer currentSpelling;
 	private char currentChar;
 	private SourcePosition sourcePos;
+	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
 
 	// =========================================================
 
@@ -221,6 +226,31 @@ public final class Scanner {
 		}
 	}
 
+	private char getEscapeChar(char ch) {
+		System.out.println("getEscapeChar(): entered");
+		char retVal = Character.MIN_VALUE;
+		if (ch == 'b') {
+			retVal = '\b';
+		} else if (ch == 'r') {
+			retVal = '\r';
+		} else if (ch == 'n') {
+			retVal = '\n';
+		} else if (ch == 't') {
+			retVal = '\t';
+		} else if (ch == 'f') {
+			retVal = '\f';
+		} else if (ch == '\'') {
+			retVal = '\'';
+		} else if (ch == '"') {
+			retVal = '"';
+		} else if (ch == '\\') {
+			retVal = '\\';
+		} else {
+			System.out.println("no escape char found");
+		}
+		return retVal;
+	}
+
 	private int checkLiterals() {
 		//TODO: boolean literals
 		System.out.println("checkLiterals(): entered");
@@ -229,19 +259,27 @@ public final class Scanner {
 		boolean isInt = false;
 		int retVal = -1;
 		if (currentChar == '"' ) {
-			accept();
-			currentSpelling.append(currentChar);
 			// add to spelling until we find the terminting " keeping eating the chars
 			// TODO: handle escaping of quotation marks
-			while (currentChar != '"') {
+			do {
+				accept();
+				// TODO: check for CRLF as well, maybe you might have to accept twice
 				if (currentChar == '\n' || currentChar == '\r') {
 					errorReporter.reportError("unterminated string", currentSpelling.toString(), sourcePos);
 					return Token.STRINGLITERAL;
+				} else if (currentChar == '\\') {
+					if (escapeChars.contains(inspectChar(1))) {
+						System.out.println("checkLiterals(): got an escape character");
+						currentSpelling.append(getEscapeChar(inspectChar(1)));
+						accept();
+						continue;
+					}
+				} else {
+					System.out.println("checkLiterals(): just a normal char, adding it to spelling");
+					currentSpelling.append(currentChar);
 				}
-				accept();
-				currentSpelling.append(currentChar);
 
-			}
+			} while (currentChar != '"');
 			// get rid of the last quotation
 			currentSpelling.deleteCharAt(currentSpelling.length()-1);
 			// accept once for the extra quotation
