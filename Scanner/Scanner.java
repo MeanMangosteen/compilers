@@ -17,7 +17,8 @@ public final class Scanner {
 	private ErrorReporter errorReporter;
 	private StringBuffer currentSpelling;
 	private char currentChar;
-	private SourcePosition sourcePos;
+	private SourcePosition sourcePos = new SourcePosition(1,1);
+	private SourcePosition tokenPos;
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
 
 	// =========================================================
@@ -38,10 +39,21 @@ public final class Scanner {
 	// accept gets the next character from the source program.
 
 	private void accept() {
-
 		currentChar = sourceFile.getNextChar();
+		if (Character.isWhitespace(currentChar)) {
+			sourcePos.charStart++;
+			sourcePos.charFinish++;
+		} else {
+			sourcePos.charFinish++;
+		}
+		System.out.println("accept(): charFinish is now: " + sourcePos.charFinish );
 		if (currentChar == '\n') {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 			System.out.println("the current char is the linefeed character");
+			sourcePos.lineStart = sourcePos.lineFinish;
+			sourcePos.lineFinish++;
+			sourcePos.charStart = 0;
+			sourcePos.charFinish = 0;
 		} else if (currentChar == '\r') {
 			System.out.println("the current char is the carridge return character");
 		} else {
@@ -404,6 +416,10 @@ public final class Scanner {
 		  break;*/
 	}
 
+	boolean isNewline() {
+		return false;
+	}
+
 	void skipSpaceAndComments() {
 		// TODO: handle multiline comments
 		System.out.println("skipSpaceAndComments(): entered");
@@ -471,10 +487,11 @@ public final class Scanner {
 		int kind;
 
 		System.out.println("getToken: getting new token");
+		System.out.println("getToken: sourcePos.charFinish is " + sourcePos.charFinish);
 
 		currentSpelling = new StringBuffer("");
 
-		sourcePos = new SourcePosition();
+		sourcePos.charStart = sourcePos.charFinish;
         
 	    errorReporter = new ErrorReporter();
 
@@ -489,7 +506,7 @@ public final class Scanner {
 		// its kings represented as an 'int' (Token.ID, Token.PLUS)
 		// its pselling represented as a string ("sum", "+")
 		// its position in the program represented as an object of the lcass SourcePosition
-		tok = new Token(kind, currentSpelling.toString(), sourcePos);
+		tok = new Token(kind, currentSpelling.toString(), tokenPos);
 
 		// * do not remove these three lines
 		if (debug)
