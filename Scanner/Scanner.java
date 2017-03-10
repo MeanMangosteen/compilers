@@ -5,43 +5,7 @@
 package VC.Scanner;
 
 import VC.ErrorReporter;
-
-public final class Scanner {
-	private static String[] spellings = new String[] {
-		"boolean",
-			"break",
-			"continue",
-			"else",
-			"float",
-			"for",
-			"if",
-			"int",
-			"return",
-			"void",
-			"while",
-			"+",
-			"-",
-			"*",
-			"/",
-			"!",
-			"!=",
-			"=",
-			"==",
-			"<",
-			"<=",
-			">",
-			">=",
-			"&&",
-			"||",
-			"{",
-			"}",
-			"(",
-			")",
-			"[",
-			"]",
-			";",
-			","
-	};
+public final class Scanner { 
 
 	private SourceFile sourceFile;
 	private boolean debug;
@@ -178,49 +142,47 @@ public final class Scanner {
 				}
 				else {
 					retVal = Token.NOT;
+                    accept();
 				}
 				break;
 			case '=':
-				accept();
 				if (currentChar == '=') {
 					accept();
 					retVal = Token.EQEQ;
 				} else {
 					retVal = Token.EQ;
+                    accept();
 				}
 				break;
 			case '<':
-				accept();
 				if (currentChar == '=') {
 					accept();
 					retVal = Token.LTEQ;
 				} else {
 					retVal = Token.LT;
+                    accept();
 				}
 				break;
 			case '>':
-				accept();
 				if (currentChar == '=') {
 					accept();
 					retVal = Token.GTEQ;
 				} else {
 					retVal = Token.GT;
+                    accept();
 				}
 				break;
 			case '&':
-				accept();
 				if (inspectChar(1) == '&') {
 					accept(); accept();
 					retVal = Token.ANDAND;
 				}
+				accept();
 				break;
 			default:
 				System.out.println("checkOperators: received invalid token type");
 		}
-		if (retVal < 0) {
-			// error add to spelling
-			currentSpelling.append(currentChar);
-		} else {
+		if (retVal > 0) {
 			currentSpelling.append(Token.spell(retVal));
 		}
 		return retVal;
@@ -233,15 +195,15 @@ public final class Scanner {
 		if (currentChar >= 'a' && currentChar <= 'z'
 				|| currentChar >= 'A' && currentChar <= 'Z'
 				|| currentChar == '_') {
+            currentSpelling.append(currentChar);
 			accept();
-			// TODO: add to spelling
 			while (true) {
 				// now numbers in ID are valid
 				if (currentChar >= 'a' && currentChar <= 'z'
 						|| currentChar >= 'A' && currentChar <= 'Z'
 						|| currentChar >= '0' && currentChar <= '9'
 						|| currentChar == '_') {
-					// TODO: add to speeling
+                    currentSpelling.append(currentChar);
 					accept();
 					// the identifier spells a boolean value, 
 					if (currentSpelling.toString().equals("true") ||
@@ -377,7 +339,12 @@ public final class Scanner {
 				return tokenID;
 			}
 		}
+
 		System.out.println("nextToken: error in identifying token");
+        // erroneous token spelling
+        if (currentSpelling.toString().equals("")) {
+            currentSpelling.append(currentChar);
+        }
 		// to flush the errenous curr char out
 		accept();
 		return Token.ERROR;
@@ -409,6 +376,7 @@ public final class Scanner {
 				while (currentChar != '\n' && currentChar != '\r') {
 					accept();
 				}
+                // we've hit the new line, now remove the newline
 				if (currentChar == '\r' && inspectChar(1) == '\n') {
 					// if CRLF then remove both
 					accept();
@@ -418,7 +386,23 @@ public final class Scanner {
 					accept();
 				}
 				skipSpaceAndComments();
-			}
+			} else if (inspectChar(1) == '*') {
+                // multiline comment
+                System.out.println("skipSpaceAndComments(): start of multiline string");
+                accept(); accept();
+                while (true) {
+                    if (currentChar == '*' && inspectChar(1) == '/') {
+                        System.out.println("skipSpaceAndComments(); end of multilin string");
+                        accept(); accept();
+                        skipSpaceAndComments();
+                        break;
+                    } else if (currentChar == SourceFile.eof) {
+                        errorReporter.reportError("Unterminated comment", "/**/", sourcePos);
+                        break;
+                    }
+                    accept();
+                }
+            }
 		} else if (currentChar == '\n' || currentChar == '\r') {
 			System.out.println("skipSpaceAndComents: there line terminator detected");
 			// if the current token is a line terminator remove it
@@ -444,13 +428,14 @@ public final class Scanner {
 
 		System.out.println("getToken: getting new token");
 
-		// skip white space and comments
-
-		skipSpaceAndComments();
-
 		currentSpelling = new StringBuffer("");
 
 		sourcePos = new SourcePosition();
+        
+	    errorReporter = new ErrorReporter();
+
+		// skip white space and comments
+		skipSpaceAndComments();
 
 		// You must record the position of the current token somehow
 
