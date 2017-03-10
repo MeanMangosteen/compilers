@@ -40,7 +40,8 @@ public final class Scanner {
 
 	private void accept() {
 		currentChar = sourceFile.getNextChar();
-		if (Character.isWhitespace(currentChar)) {
+		if (currentChar == ' ') {
+			System.out.println("accept(): whitespace character");
 			sourcePos.charFinish++;
 		} else {
 			sourcePos.charFinish++;
@@ -166,8 +167,8 @@ public final class Scanner {
 				}
 				break;
 			case '=':
-				if (currentChar == '=') {
-					accept();
+				if (inspectChar(1) == '=') {
+					accept(); accept();
 					retVal = Token.EQEQ;
 				} else {
 					retVal = Token.EQ;
@@ -175,8 +176,8 @@ public final class Scanner {
 				}
 				break;
 			case '<':
-				if (currentChar == '=') {
-					accept();
+				if (inspectChar(1) == '=') {
+					accept(); accept();
 					retVal = Token.LTEQ;
 				} else {
 					retVal = Token.LT;
@@ -184,8 +185,8 @@ public final class Scanner {
 				}
 				break;
 			case '>':
-				if (currentChar == '=') {
-					accept();
+				if (inspectChar(1)== '=') {
+					accept();accept();
 					retVal = Token.GTEQ;
 				} else {
 					retVal = Token.GT;
