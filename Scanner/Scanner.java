@@ -137,7 +137,7 @@ public final class Scanner {
 				System.out.println("checkSeperators: recieved invalid token type");
 		}
 		if (retVal > 0) {
-			currentSpelling.append(spellings[retVal]);
+			currentSpelling.append(Token.spell(retVal));
 		}
 		return retVal;
 	}
@@ -334,6 +334,7 @@ public final class Scanner {
 	private int checkSpecial() {
 		System.out.println("checkSpecial(): entered");
 		if (currentChar == SourceFile.eof) {
+			currentSpelling.append(Token.spell(Token.EOF));
 			return Token.EOF;
 		} else {
 			System.out.println("checkSpecial: received invalid token type");
