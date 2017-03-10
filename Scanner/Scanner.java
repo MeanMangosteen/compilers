@@ -273,6 +273,11 @@ public final class Scanner {
 						currentSpelling.append(getEscapeChar(inspectChar(1)));
 						accept();
 						continue;
+					} else {
+						String illegal_escape = new StringBuilder().append("").append(currentChar).append(inspectChar(1)).toString();
+						System.out.println("checkLiterals(): the illegal escape character is " + illegal_escape);
+						errorReporter.reportError("%: illegal escape character", illegal_escape, sourcePos);
+						currentSpelling.append(currentChar);
 					}
 				} else {
 					System.out.println("checkLiterals(): just a normal char, adding it to spelling");
