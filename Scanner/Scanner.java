@@ -17,7 +17,7 @@ public final class Scanner {
 	private ErrorReporter errorReporter;
 	private StringBuffer currentSpelling;
 	private char currentChar;
-	private SourcePosition sourcePos = new SourcePosition(1,1);
+	private SourcePosition sourcePos = new SourcePosition(1,1,1);
 	private SourcePosition tokenPos;
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
 
