@@ -235,7 +235,8 @@ public final class Scanner {
 			// TODO: handle escaping of quotation marks
 			while (currentChar != '"') {
 				if (currentChar == '\n' || currentChar == '\r') {
-					return Token.ERROR;
+					errorReporter.reportError("unterminated string", currentSpelling.toString(), sourcePos);
+					return Token.STRINGLITERAL;
 				}
 				accept();
 				currentSpelling.append(currentChar);
