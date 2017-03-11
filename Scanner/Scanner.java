@@ -46,7 +46,7 @@ public final class Scanner {
 		currentChar = sourceFile.getNextChar();
 		if (currentChar == '\t') {
 			sourcePos.charFinish += getTabLength();
-            charsBeforeTab = 0;
+			charsBeforeTab = 0;
 		} else {
 			sourcePos.charFinish++;
             charsBeforeTab++;
@@ -497,7 +497,7 @@ public final class Scanner {
 	public Token getToken() {
 		Token tok;
 		int kind;
-
+		charsBeforeTab = 0;
 		
 		
 
