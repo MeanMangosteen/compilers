@@ -17,7 +17,7 @@ public final class Scanner {
 	private ErrorReporter errorReporter;
 	private StringBuffer currentSpelling;
 	private char currentChar;
-	private SourcePosition sourcePos = new SourcePosition(1,1,1);
+	private SourcePosition sourcePos = new SourcePosition(1,0,0);
 	private SourcePosition tokenPos;
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
     private int charsBeforeTab = 0;
@@ -61,14 +61,11 @@ public final class Scanner {
 			sourcePos.charStart = 1;
 			sourcePos.charFinish = 0;
 			charsBeforeTab = 0;
-		} else if (currentChar == '\r') {
-			
-		} else if (currentChar == SourceFile.eof) {
-			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
-		} else {
-			
 		}
 		currentChar = sourceFile.getNextChar();
+		if (currentChar == SourceFile.eof) {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
+		}
 		System.out.println("accept(): charStart is " + sourcePos.charStart);
 		System.out.println("accpet(): charFinish is " + sourcePos.charFinish);
 		
