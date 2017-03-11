@@ -46,28 +46,27 @@ public final class Scanner {
 		
 		if (currentChar == '\t') {
 			
-			
 			sourcePos.charFinish += getTabLength();
 			charsBeforeTab = 0;
 		} else {
 			sourcePos.charFinish++;
 			charsBeforeTab++;
 		}
-		currentChar = sourceFile.getNextChar();
 		if (currentChar == '\n') {
+			
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 			
 			sourcePos.lineStart = sourcePos.lineFinish;
 			sourcePos.lineFinish++;
 			sourcePos.charStart = 1;
 			sourcePos.charFinish = 0;
-		} else if (currentChar == '\r') {
-			
-		} else if (currentChar == SourceFile.eof) {
-			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
-		} else {
-			
+			charsBeforeTab = 0;
 		}
+		currentChar = sourceFile.getNextChar();
+		if (currentChar == SourceFile.eof) {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
+		}
+		
 		
 		
 		
@@ -405,8 +404,8 @@ public final class Scanner {
 		for (Tokens tokenType: Tokens.values()) {
 			tokenID = tokenChecker(tokenType);
 			if (tokenID >= 0) {
-				if (currentChar != '\n' && currentChar != SourceFile.eof) {
-					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
+				if (currentChar != SourceFile.eof) {
+					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
 				}
 				return tokenID;
 			}
@@ -509,7 +508,7 @@ public final class Scanner {
 
 		skipSpaceAndComments();
 
-		sourcePos.charStart = sourcePos.charFinish ;
+		sourcePos.charStart = sourcePos.charFinish + 1 ;
         
 	    errorReporter = new ErrorReporter();
 
