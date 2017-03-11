@@ -41,28 +41,28 @@ public final class Scanner {
 	private void accept() {
 		currentChar = sourceFile.getNextChar();
 		if (currentChar == '\t') {
-			System.out.println("accept(): tab character");
+			
 			sourcePos.charFinish += 8;
 		} else {
 			sourcePos.charFinish++;
 		}
 		if (currentChar == '\n') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
-			System.out.println("the current char is the linefeed character");
+			
 			sourcePos.lineStart = sourcePos.lineFinish;
 			sourcePos.lineFinish++;
 			sourcePos.charStart = 1;
 			sourcePos.charFinish = 0;
 		} else if (currentChar == '\r') {
-			System.out.println("the current char is the carridge return character");
+			
 		} else if (currentChar == SourceFile.eof) {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
 		} else {
-			System.out.println("accept(): the curr char is now " + currentChar);
+			
 		}
-		System.out.println("accept(): lineFinish now: " + sourcePos.lineFinish);
-		System.out.println("accept(): charStart is now: " + sourcePos.charStart);
-		System.out.println("accept(): charFinish is now: " + sourcePos.charFinish );
+		
+		
+		
 
 		// you may save the lexeme of the current token incrementally here
 		// you may also increment your line and column counters here
@@ -84,7 +84,7 @@ public final class Scanner {
 
 	private int checkSeperators() {
 		int retVal = -1;
-		System.out.println("checkSeperators(): entered");
+		
 		switch (currentChar) {
 			case '(':
 				accept();
@@ -119,7 +119,7 @@ public final class Scanner {
 				retVal = Token.COMMA;
 				break;
 			default:
-				System.out.println("checkSeperators: recieved invalid token type");
+				
 		}
 		if (retVal > 0) {
 			currentSpelling.append(Token.spell(retVal));
@@ -130,7 +130,7 @@ public final class Scanner {
 	private int checkOperators() {
 		int retVal = -1;
 		// TODO: find a way to add spelling 
-		System.out.println("checkOperators(): entered");
+		
 		switch(currentChar) { 
 			case '|':
 				if (inspectChar(1) == '|') {
@@ -201,7 +201,7 @@ public final class Scanner {
 				accept();
 				break;
 			default:
-				System.out.println("checkOperators: received invalid token type");
+				
 		}
 		if (retVal > 0) {
 			currentSpelling.append(Token.spell(retVal));
@@ -210,7 +210,7 @@ public final class Scanner {
 	}
 
 	private int checkIdentifiers() {
-		System.out.println("checkIdentifiers(): entered");
+		
 		// check for IDs
 		// has to start with letter or underscore
 		if (currentChar >= 'a' && currentChar <= 'z'
@@ -237,13 +237,13 @@ public final class Scanner {
 				}
 			}
 		} else {
-			System.out.println("checkIdentifers: received invalid token type");
+			
 			return -1;
 		}
 	}
 
 	private char getEscapeChar(char ch) {
-		System.out.println("getEscapeChar(): entered");
+		
 		char retVal = Character.MIN_VALUE;
 		if (ch == 'b') {
 			retVal = '\b';
@@ -262,14 +262,14 @@ public final class Scanner {
 		} else if (ch == '\\') {
 			retVal = '\\';
 		} else {
-			System.out.println("no escape char found");
+			
 		}
 		return retVal;
 	}
 
 	private int checkLiterals() {
 		//TODO: boolean literals
-		System.out.println("checkLiterals(): entered");
+		
 		// TODO: this is checking for ID's, it should be checking for string literials 
 		boolean isFloat = false;
 		boolean isInt = false;
@@ -285,18 +285,18 @@ public final class Scanner {
 					return Token.STRINGLITERAL;
 				} else if (currentChar == '\\') {
 					if (escapeChars.contains(inspectChar(1))) {
-						System.out.println("checkLiterals(): got an escape character");
+						
 						currentSpelling.append(getEscapeChar(inspectChar(1)));
 						accept();
 						continue;
 					} else {
 						String illegal_escape = new StringBuilder().append("").append(currentChar).append(inspectChar(1)).toString();
-						System.out.println("checkLiterals(): the illegal escape character is " + illegal_escape);
+						
 						errorReporter.reportError("%: illegal escape character", illegal_escape, sourcePos);
 						currentSpelling.append(currentChar);
 					}
 				} else {
-					System.out.println("checkLiterals(): just a normal char, adding it to spelling");
+					
 					currentSpelling.append(currentChar);
 				}
 
@@ -305,7 +305,7 @@ public final class Scanner {
 			currentSpelling.deleteCharAt(currentSpelling.length()-1);
 			// accept once for the extra quotation
 			accept();
-			System.out.println("checkLiterals: we've hit the end of a string and now returning");
+			
 			return Token.STRINGLITERAL;
 		} else if (currentChar >= '0' && currentChar <= '9') {
 			retVal = Token.INTLITERAL;
@@ -344,7 +344,7 @@ public final class Scanner {
 		}
 
 		if (retVal < 0) {
-			System.out.println("checkLiterals: received invalid token type");
+			
 		}
 		return retVal;
 			// first check for ints adding to the spelling, retVal=INT
@@ -354,12 +354,12 @@ public final class Scanner {
 
 	// TODO: this should return an int
 	private int checkSpecial() {
-		System.out.println("checkSpecial(): entered");
+		
 		if (currentChar == SourceFile.eof) {
 			currentSpelling.append(Token.spell(Token.EOF));
 			return Token.EOF;
 		} else {
-			System.out.println("checkSpecial: received invalid token type");
+			
 			return -1;
 		}
 
@@ -385,7 +385,7 @@ public final class Scanner {
 			case SPECIAL:
 				return checkSpecial();
 			default:
-				System.out.println("tokenChecker: invalid token type");
+				
 				return -1;
 		}
 	}
@@ -403,7 +403,7 @@ public final class Scanner {
 			}
 		}
 
-		System.out.println("nextToken: error in identifying token");
+		
         // erroneous token spelling
         if (currentSpelling.toString().equals("")) {
             currentSpelling.append(currentChar);
@@ -429,7 +429,7 @@ public final class Scanner {
 
 	void skipSpaceAndComments() {
 		// TODO: handle multiline comments
-		System.out.println("skipSpaceAndComments(): entered");
+		
 		// skipping whitespace
 		if (Character.isWhitespace(currentChar)) {
 			accept();
@@ -438,7 +438,7 @@ public final class Scanner {
 		// skipping comments
 		if (currentChar == '/') {
 			if (inspectChar(1) == '/') {
-				System.out.println("skipSpaceAndComents: comment detected"); 
+				
 				// if we find '//' remove all chars until we hit LF or CR
 				while (currentChar != '\n' && currentChar != '\r') {
 					accept();
@@ -455,11 +455,11 @@ public final class Scanner {
 				skipSpaceAndComments();
 			} else if (inspectChar(1) == '*') {
 				// multiline comment
-				System.out.println("skipSpaceAndComments(): start of multiline string");
+				
 				accept(); accept();
 				while (true) {
 					if (currentChar == '*' && inspectChar(1) == '/') {
-						System.out.println("skipSpaceAndComments(); end of multilin string");
+						
 						accept(); accept();
 						skipSpaceAndComments();
 						break;
@@ -471,15 +471,15 @@ public final class Scanner {
 				}
 			}
 		} else if (currentChar == '\n' || currentChar == '\r') {
-			System.out.println("skipSpaceAndComents: there line terminator detected");
+			
 			// if the current token is a line terminator remove it
 			if (currentChar == '\r' && inspectChar(1) == '\n') {
-				System.out.println("skipSpaceAndComents: CRLF detected");
+				
 				// if CRLF then remove both
 				accept();
 				accept();
 			} else {
-				System.out.println("skipSpaceAndComents: either CR or LF detected");
+				
 				// if either only CR or LF remove one char
 				// TODO: I have no idea why I need two accepts here
 				accept();
@@ -493,8 +493,8 @@ public final class Scanner {
 		Token tok;
 		int kind;
 
-		System.out.println("getToken: getting new token");
-		System.out.println("getToken: sourcePos.charFinish is " + sourcePos.charFinish);
+		
+		
 
 		currentSpelling = new StringBuffer("");
 
