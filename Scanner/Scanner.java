@@ -43,14 +43,17 @@ public final class Scanner {
 	// accept gets the next character from the source program.
 
 	private void accept() {
-		currentChar = sourceFile.getNextChar();
+		System.out.println("accpet(): current char is " + currentChar);
 		if (currentChar == '\t') {
+			System.out.println("accpet(): number of chars before tab is " + charsBeforeTab);
+			System.out.println("accept(): tablength is " + getTabLength());
 			sourcePos.charFinish += getTabLength();
 			charsBeforeTab = 0;
 		} else {
 			sourcePos.charFinish++;
-            charsBeforeTab++;
+			charsBeforeTab++;
 		}
+		currentChar = sourceFile.getNextChar();
 		if (currentChar == '\n') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 			
@@ -65,7 +68,8 @@ public final class Scanner {
 		} else {
 			
 		}
-		
+		System.out.println("accept(): charStart is " + sourcePos.charStart);
+		System.out.println("accpet(): charFinish is " + sourcePos.charFinish);
 		
 		
 
@@ -495,9 +499,9 @@ public final class Scanner {
 	}
 
 	public Token getToken() {
+		System.out.println("getToken(): the current char is " + currentChar);
 		Token tok;
 		int kind;
-		charsBeforeTab = 0;
 		
 		
 
