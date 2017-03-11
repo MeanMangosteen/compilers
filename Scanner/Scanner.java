@@ -45,7 +45,6 @@ public final class Scanner {
 	private void accept() {
 		System.out.println("accpet(): current char is " + currentChar);
 		if (currentChar == '\t') {
-			System.out.println("accpet(): number of chars before tab is " + charsBeforeTab);
 			System.out.println("accept(): tablength is " + getTabLength());
 			sourcePos.charFinish += getTabLength();
 			charsBeforeTab = 0;
@@ -53,14 +52,15 @@ public final class Scanner {
 			sourcePos.charFinish++;
 			charsBeforeTab++;
 		}
-		currentChar = sourceFile.getNextChar();
 		if (currentChar == '\n') {
+			System.out.println("accept(): newline characterr");
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 			
 			sourcePos.lineStart = sourcePos.lineFinish;
 			sourcePos.lineFinish++;
 			sourcePos.charStart = 1;
 			sourcePos.charFinish = 0;
+			charsBeforeTab = 0;
 		} else if (currentChar == '\r') {
 			
 		} else if (currentChar == SourceFile.eof) {
@@ -68,9 +68,11 @@ public final class Scanner {
 		} else {
 			
 		}
+		currentChar = sourceFile.getNextChar();
 		System.out.println("accept(): charStart is " + sourcePos.charStart);
 		System.out.println("accpet(): charFinish is " + sourcePos.charFinish);
 		
+		System.out.println("accpet(): number of chars before tab is " + charsBeforeTab);
 		
 
 		// you may save the lexeme of the current token incrementally here
@@ -405,8 +407,8 @@ public final class Scanner {
 		for (Tokens tokenType: Tokens.values()) {
 			tokenID = tokenChecker(tokenType);
 			if (tokenID >= 0) {
-				if (currentChar != '\n' && currentChar != SourceFile.eof) {
-					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
+				if (currentChar != SourceFile.eof) {
+					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
 				}
 				return tokenID;
 			}
@@ -509,7 +511,7 @@ public final class Scanner {
 
 		skipSpaceAndComments();
 
-		sourcePos.charStart = sourcePos.charFinish ;
+		sourcePos.charStart = sourcePos.charFinish + 1 ;
         
 	    errorReporter = new ErrorReporter();
 
