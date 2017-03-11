@@ -20,7 +20,7 @@ public final class Scanner {
 	private SourcePosition sourcePos = new SourcePosition(1,1,1);
 	private SourcePosition tokenPos;
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
-
+    private int charsBeforeTab = 0;
 	// =========================================================
 
 	public Scanner(SourceFile source, ErrorReporter reporter) {
@@ -36,16 +36,24 @@ public final class Scanner {
 		debug = true;
 	}
 
+    private int getTabLength() {
+        return 8 - (charsBeforeTab % 8);
+    }
+
 	// accept gets the next character from the source program.
 
 	private void accept() {
-		currentChar = sourceFile.getNextChar();
+		
 		if (currentChar == '\t') {
 			
-			sourcePos.charFinish += 8;
+			
+			sourcePos.charFinish += getTabLength();
+			charsBeforeTab = 0;
 		} else {
 			sourcePos.charFinish++;
+			charsBeforeTab++;
 		}
+		currentChar = sourceFile.getNextChar();
 		if (currentChar == '\n') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 			
@@ -60,6 +68,7 @@ public final class Scanner {
 		} else {
 			
 		}
+		
 		
 		
 		
@@ -490,9 +499,9 @@ public final class Scanner {
 	}
 
 	public Token getToken() {
+		
 		Token tok;
 		int kind;
-
 		
 		
 
