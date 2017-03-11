@@ -40,9 +40,9 @@ public final class Scanner {
 
 	private void accept() {
 		currentChar = sourceFile.getNextChar();
-		if (currentChar == ' ') {
-			System.out.println("accept(): whitespace character");
-			sourcePos.charFinish++;
+		if (currentChar == '\t') {
+			System.out.println("accept(): tab character");
+			sourcePos.charFinish += 8;
 		} else {
 			sourcePos.charFinish++;
 		}
