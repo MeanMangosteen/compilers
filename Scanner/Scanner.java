@@ -37,9 +37,6 @@ public final class Scanner {
 	}
 
 	private int getTabLength() {
-		if (sourcePos.charStart == 1) {
-			charsBeforeTab = 1;
-		}
 		return 8 - (charsBeforeTab % 8);
 	}
 
@@ -57,7 +54,8 @@ public final class Scanner {
 		} else if (currentChar == '\n') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
 			System.out.println("accept(): newline characterr");
-			sourcePos.charStart = sourcePos.charFinish = 1;
+			sourcePos.charStart = 1;
+			sourcePos.charFinish = 0;
 			sourcePos.lineFinish++;
 			charsBeforeTab = 0;
 		} else if (currentChar == SourceFile.eof) {
@@ -408,7 +406,7 @@ public final class Scanner {
 		for (Tokens tokenType: Tokens.values()) {
 			tokenID = tokenChecker(tokenType);
 			if (tokenID >= 0) {
-				if (currentChar != SourceFile.eof || currentChar != '\t' || currentChar != '\n') {
+				if (currentChar != SourceFile.eof && currentChar != '\t' && currentChar != '\n') {
 					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 				}
 				return tokenID;
@@ -440,6 +438,7 @@ public final class Scanner {
 	}
 
 	void skipSpaceAndComments() {
+		System.out.println("skipSpaceAndComments(): entered");
 		// TODO: handle multiline comments
 
 		// skipping whitespace
