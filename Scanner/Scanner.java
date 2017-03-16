@@ -37,6 +37,9 @@ public final class Scanner {
 	}
 
 	private int getTabLength() {
+		if (sourcePos.charStart == 1) {
+			charsBeforeTab = 1;
+		}
 		return 8 - (charsBeforeTab % 8);
 	}
 
@@ -47,10 +50,12 @@ public final class Scanner {
 		System.out.println("accpet(): current char is " + currentChar);
 		// re
 		if (currentChar == '\t') {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
 			System.out.println("accept(): tab characterr");
 			sourcePos.charFinish += getTabLength();
 			charsBeforeTab = 0;
 		} else if (currentChar == '\n') {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
 			System.out.println("accept(): newline characterr");
 			sourcePos.charStart = sourcePos.charFinish = 1;
 			sourcePos.lineFinish++;
@@ -142,8 +147,9 @@ public final class Scanner {
 					accept();
 					accept();
 					retVal = Token.OROR;
+				} else {
+					accept();
 				}
-				accept();
 				break;
 			case '+':
 				accept();
@@ -202,8 +208,9 @@ public final class Scanner {
 				if (inspectChar(1) == '&') {
 					accept(); accept();
 					retVal = Token.ANDAND;
+				} else {
+					accept();
 				}
-				accept();
 				break;
 			default:
 
@@ -401,7 +408,7 @@ public final class Scanner {
 		for (Tokens tokenType: Tokens.values()) {
 			tokenID = tokenChecker(tokenType);
 			if (tokenID >= 0) {
-				if (currentChar != SourceFile.eof) {
+				if (currentChar != SourceFile.eof || currentChar != '\t' || currentChar != '\n') {
 					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 				}
 				return tokenID;
@@ -414,7 +421,7 @@ public final class Scanner {
 			currentSpelling.append(currentChar);
 		}
 		// to flush the errenous curr char out
-		accept();
+		//accept();
 		return Token.ERROR;
 		// TODO: remove this
 		/*case SourceFile.eof:
