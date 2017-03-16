@@ -1,0 +1,21 @@
+true // TODO: test with and without comment as first line
+// plain tab
+	true | ||
+// space then tab
+ 	true | ||
+// tab then space
+	 true | ||
+// seven spaces then tab
+       	true | ||
+//eight spaces then tab
+        	true | ||
+// two tabs
+		true | ||
+// tab before tab after
+	true	| ||
+// tab before space and tab after
+	true 	| ||
+// tab before tab and space after
+	true	 | ||
+// space and tab before tab and space after
+ 	true	 | ||

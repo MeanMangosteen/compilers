@@ -1,0 +1,1866 @@
+======= The VC compiler =======
+getToken(): the current char is t
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+accpet(): current char is u
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+Kind = 33 [<id>], spelling = "true", position = 1(1)..1(4)
+getToken(): the current char is  
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is T
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is O
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is D
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is O
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is :
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is w
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is i
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 24
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 26
+accpet(): number of chars before tab is 25
+accpet(): current char is d
+accept(): charStart is 1
+accpet(): charFinish is 27
+accpet(): number of chars before tab is 26
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 28
+accpet(): number of chars before tab is 27
+accpet(): current char is w
+accept(): charStart is 1
+accpet(): charFinish is 29
+accpet(): number of chars before tab is 28
+accpet(): current char is i
+accept(): charStart is 1
+accpet(): charFinish is 30
+accpet(): number of chars before tab is 29
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 31
+accpet(): number of chars before tab is 30
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 32
+accpet(): number of chars before tab is 31
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 33
+accpet(): number of chars before tab is 32
+accpet(): current char is u
+accept(): charStart is 1
+accpet(): charFinish is 34
+accpet(): number of chars before tab is 33
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 35
+accpet(): number of chars before tab is 34
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 36
+accpet(): number of chars before tab is 35
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 37
+accpet(): number of chars before tab is 36
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 38
+accpet(): number of chars before tab is 37
+accpet(): current char is m
+accept(): charStart is 1
+accpet(): charFinish is 39
+accpet(): number of chars before tab is 38
+accpet(): current char is m
+accept(): charStart is 1
+accpet(): charFinish is 40
+accpet(): number of chars before tab is 39
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 41
+accpet(): number of chars before tab is 40
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 42
+accpet(): number of chars before tab is 41
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 43
+accpet(): number of chars before tab is 42
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 44
+accpet(): number of chars before tab is 43
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 45
+accpet(): number of chars before tab is 44
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 46
+accpet(): number of chars before tab is 45
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 47
+accpet(): number of chars before tab is 46
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 48
+accpet(): number of chars before tab is 47
+accpet(): current char is i
+accept(): charStart is 1
+accpet(): charFinish is 49
+accpet(): number of chars before tab is 48
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 50
+accpet(): number of chars before tab is 49
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 51
+accpet(): number of chars before tab is 50
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 52
+accpet(): number of chars before tab is 51
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 53
+accpet(): number of chars before tab is 52
+accpet(): current char is l
+accept(): charStart is 1
+accpet(): charFinish is 54
+accpet(): number of chars before tab is 53
+accpet(): current char is i
+accept(): charStart is 1
+accpet(): charFinish is 55
+accpet(): number of chars before tab is 54
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 56
+accpet(): number of chars before tab is 55
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 57
+accpet(): number of chars before tab is 56
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is l
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is i
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 10
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 5
+Kind = 33 [<id>], spelling = "true", position = 3(10)..3(13)
+getToken(): the current char is  
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 15
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 7
+accpet(): current char is |
+accept(): charStart is 15
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 8
+Kind = 38 [<error>], spelling = " ", position = 3(10)..3(13)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 17
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 9
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 4(1)..4(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 10
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 5
+Kind = 33 [<id>], spelling = "true", position = 5(10)..5(13)
+getToken(): the current char is  
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 15
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 7
+accpet(): current char is |
+accept(): charStart is 15
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 8
+Kind = 38 [<error>], spelling = " ", position = 5(10)..5(13)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 17
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 9
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 6(1)..6(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is r
+accept(): charStart is 11
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is u
+accept(): charStart is 11
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is e
+accept(): charStart is 11
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 5
+accpet(): current char is  
+accept(): charStart is 11
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 6
+Kind = 33 [<id>], spelling = "true", position = 7(11)..7(14)
+getToken(): the current char is  
+accpet(): current char is |
+accept(): charStart is 11
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 7
+accpet(): current char is  
+accept(): charStart is 16
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 8
+accpet(): current char is |
+accept(): charStart is 16
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 9
+Kind = 38 [<error>], spelling = " ", position = 7(11)..7(14)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 18
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 10
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 8(1)..8(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is v
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 24
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 10
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 5
+Kind = 33 [<id>], spelling = "true", position = 9(10)..9(13)
+getToken(): the current char is  
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 15
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 7
+accpet(): current char is |
+accept(): charStart is 15
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 8
+Kind = 38 [<error>], spelling = " ", position = 9(10)..9(13)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 17
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 9
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 10(1)..10(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is i
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is g
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is h
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 18
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 18
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 18
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 18
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 5
+Kind = 33 [<id>], spelling = "true", position = 11(18)..11(21)
+getToken(): the current char is  
+accpet(): current char is |
+accept(): charStart is 18
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 23
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 7
+accpet(): current char is |
+accept(): charStart is 23
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 8
+Kind = 38 [<error>], spelling = " ", position = 11(18)..11(21)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 25
+accpet(): charFinish is 26
+accpet(): number of chars before tab is 9
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 12(1)..12(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is w
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 18
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 18
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 18
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 18
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 5
+Kind = 33 [<id>], spelling = "true", position = 13(18)..13(21)
+getToken(): the current char is  
+accpet(): current char is |
+accept(): charStart is 18
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 23
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 7
+accpet(): current char is |
+accept(): charStart is 23
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 8
+Kind = 38 [<error>], spelling = " ", position = 13(18)..13(21)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 25
+accpet(): charFinish is 26
+accpet(): number of chars before tab is 9
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 14(1)..14(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 10
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 0
+Kind = 33 [<id>], spelling = "true", position = 15(10)..15(16)
+getToken(): the current char is 	
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 1
+accpet(): current char is  
+accept(): charStart is 18
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 2
+accpet(): current char is |
+accept(): charStart is 18
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 3
+Kind = 38 [<error>], spelling = " ", position = 15(10)..15(16)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 20
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 4
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 16(1)..16(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is d
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 24
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 26
+accpet(): number of chars before tab is 25
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 27
+accpet(): number of chars before tab is 26
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 28
+accpet(): number of chars before tab is 27
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 29
+accpet(): number of chars before tab is 28
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 30
+accpet(): number of chars before tab is 29
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 31
+accpet(): number of chars before tab is 30
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 32
+accpet(): number of chars before tab is 31
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 33
+accpet(): number of chars before tab is 32
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 34
+accpet(): number of chars before tab is 33
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is  
+accept(): charStart is 10
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 5
+Kind = 33 [<id>], spelling = "true", position = 17(10)..17(13)
+getToken(): the current char is  
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 10
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 0
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 1
+accpet(): current char is  
+accept(): charStart is 18
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 2
+accpet(): current char is |
+accept(): charStart is 18
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 3
+Kind = 38 [<error>], spelling = " ", position = 17(10)..17(13)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 20
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 4
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 18(1)..18(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is d
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 24
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 26
+accpet(): number of chars before tab is 25
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 27
+accpet(): number of chars before tab is 26
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 28
+accpet(): number of chars before tab is 27
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 29
+accpet(): number of chars before tab is 28
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 30
+accpet(): number of chars before tab is 29
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 31
+accpet(): number of chars before tab is 30
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 32
+accpet(): number of chars before tab is 31
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 33
+accpet(): number of chars before tab is 32
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 34
+accpet(): number of chars before tab is 33
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 10
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 0
+Kind = 33 [<id>], spelling = "true", position = 19(10)..19(16)
+getToken(): the current char is 	
+accpet(): current char is  
+accept(): charStart is 10
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 1
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 19
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 3
+accpet(): current char is |
+accept(): charStart is 19
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 4
+Kind = 38 [<error>], spelling = " ", position = 19(10)..19(16)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 21
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 5
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+Kind = 24 [||], spelling = "||", position = 20(1)..20(1)
+getToken(): the current char is /
+accpet(): current char is /
+accept(): charStart is 1
+accpet(): charFinish is 3
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 4
+accpet(): number of chars before tab is 3
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 5
+accpet(): number of chars before tab is 4
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 6
+accpet(): number of chars before tab is 5
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 7
+accpet(): number of chars before tab is 6
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 8
+accpet(): number of chars before tab is 7
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 8
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 9
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 10
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 11
+accpet(): current char is d
+accept(): charStart is 1
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 12
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 14
+accpet(): number of chars before tab is 13
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 15
+accpet(): number of chars before tab is 14
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 16
+accpet(): number of chars before tab is 15
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 16
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 17
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 18
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 19
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 20
+accpet(): current char is o
+accept(): charStart is 1
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 21
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 23
+accpet(): number of chars before tab is 22
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 24
+accpet(): number of chars before tab is 23
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 25
+accpet(): number of chars before tab is 24
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 26
+accpet(): number of chars before tab is 25
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 27
+accpet(): number of chars before tab is 26
+accpet(): current char is b
+accept(): charStart is 1
+accpet(): charFinish is 28
+accpet(): number of chars before tab is 27
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 29
+accpet(): number of chars before tab is 28
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 30
+accpet(): number of chars before tab is 29
+accpet(): current char is n
+accept(): charStart is 1
+accpet(): charFinish is 31
+accpet(): number of chars before tab is 30
+accpet(): current char is d
+accept(): charStart is 1
+accpet(): charFinish is 32
+accpet(): number of chars before tab is 31
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 33
+accpet(): number of chars before tab is 32
+accpet(): current char is s
+accept(): charStart is 1
+accpet(): charFinish is 34
+accpet(): number of chars before tab is 33
+accpet(): current char is p
+accept(): charStart is 1
+accpet(): charFinish is 35
+accpet(): number of chars before tab is 34
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 36
+accpet(): number of chars before tab is 35
+accpet(): current char is c
+accept(): charStart is 1
+accpet(): charFinish is 37
+accpet(): number of chars before tab is 36
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 38
+accpet(): number of chars before tab is 37
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 39
+accpet(): number of chars before tab is 38
+accpet(): current char is a
+accept(): charStart is 1
+accpet(): charFinish is 40
+accpet(): number of chars before tab is 39
+accpet(): current char is f
+accept(): charStart is 1
+accpet(): charFinish is 41
+accpet(): number of chars before tab is 40
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 42
+accpet(): number of chars before tab is 41
+accpet(): current char is e
+accept(): charStart is 1
+accpet(): charFinish is 43
+accpet(): number of chars before tab is 42
+accpet(): current char is r
+accept(): charStart is 1
+accpet(): charFinish is 44
+accpet(): number of chars before tab is 43
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 2
+accpet(): number of chars before tab is 1
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 1
+accpet(): charFinish is 9
+accpet(): number of chars before tab is 0
+accpet(): current char is t
+accept(): charStart is 1
+accpet(): charFinish is 10
+accpet(): number of chars before tab is 1
+accpet(): current char is r
+accept(): charStart is 10
+accpet(): charFinish is 11
+accpet(): number of chars before tab is 2
+accpet(): current char is u
+accept(): charStart is 10
+accpet(): charFinish is 12
+accpet(): number of chars before tab is 3
+accpet(): current char is e
+accept(): charStart is 10
+accpet(): charFinish is 13
+accpet(): number of chars before tab is 4
+accpet(): current char is 	
+accept(): tab characterr
+accept(): charStart is 10
+accpet(): charFinish is 17
+accpet(): number of chars before tab is 0
+Kind = 33 [<id>], spelling = "true", position = 21(10)..21(16)
+getToken(): the current char is 	
+accpet(): current char is  
+accept(): charStart is 10
+accpet(): charFinish is 18
+accpet(): number of chars before tab is 1
+accpet(): current char is |
+accept(): charStart is 10
+accpet(): charFinish is 19
+accpet(): number of chars before tab is 2
+accpet(): current char is  
+accept(): charStart is 19
+accpet(): charFinish is 20
+accpet(): number of chars before tab is 3
+accpet(): current char is |
+accept(): charStart is 19
+accpet(): charFinish is 21
+accpet(): number of chars before tab is 4
+Kind = 38 [<error>], spelling = " ", position = 21(10)..21(16)
+getToken(): the current char is |
+accpet(): current char is |
+accept(): charStart is 21
+accpet(): charFinish is 22
+accpet(): number of chars before tab is 5
+accpet(): current char is 
+
+accept(): newline characterr
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+accpet(): current char is  
+accept(): charStart is 1
+accpet(): charFinish is 1
+accpet(): number of chars before tab is 0
+Kind = 24 [||], spelling = "||", position = 1(1)..23(1)
+getToken(): the current char is  
+Kind = 39 [$], spelling = "$", position = 1(1)..23(1)
