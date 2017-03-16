@@ -17,10 +17,10 @@ public final class Scanner {
 	private ErrorReporter errorReporter;
 	private StringBuffer currentSpelling;
 	private char currentChar;
-	private SourcePosition sourcePos = new SourcePosition(1,0,0);
+	private SourcePosition sourcePos = new SourcePosition(1,1,1);
 	private SourcePosition tokenPos;
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
-    private int charsBeforeTab = 0;
+	private int charsBeforeTab = 0;
 	// =========================================================
 
 	public Scanner(SourceFile source, ErrorReporter reporter) {
@@ -36,41 +36,37 @@ public final class Scanner {
 		debug = true;
 	}
 
-    private int getTabLength() {
-        return 8 - (charsBeforeTab % 8);
-    }
+	private int getTabLength() {
+		return 8 - (charsBeforeTab % 8);
+	}
 
 	// accept gets the next character from the source program.
 
 	private void accept() {
+		currentChar = sourceFile.getNextChar();
 		System.out.println("accpet(): current char is " + currentChar);
+		// re
 		if (currentChar == '\t') {
-			System.out.println("accept(): tablength is " + getTabLength());
+			System.out.println("accept(): tab characterr");
 			sourcePos.charFinish += getTabLength();
 			charsBeforeTab = 0;
+		} else if (currentChar == '\n') {
+			System.out.println("accept(): newline characterr");
+			sourcePos.charStart = sourcePos.charFinish = 1;
+			sourcePos.lineFinish++;
+			charsBeforeTab = 0;
+		} else if (currentChar == SourceFile.eof) {
+			sourcePos.lineFinish++;
+			sourcePos.charStart = sourcePos.charFinish = 1;
+			tokenPos = sourcePos;
 		} else {
 			sourcePos.charFinish++;
 			charsBeforeTab++;
 		}
-		if (currentChar == '\n') {
-			System.out.println("accept(): newline characterr");
-			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
-			
-			sourcePos.lineStart = sourcePos.lineFinish;
-			sourcePos.lineFinish++;
-			sourcePos.charStart = 1;
-			sourcePos.charFinish = 0;
-			charsBeforeTab = 0;
-		}
-		currentChar = sourceFile.getNextChar();
-		if (currentChar == SourceFile.eof) {
-			tokenPos = new SourcePosition(sourcePos.lineFinish, 1,1);
-		}
 		System.out.println("accept(): charStart is " + sourcePos.charStart);
 		System.out.println("accpet(): charFinish is " + sourcePos.charFinish);
-		
 		System.out.println("accpet(): number of chars before tab is " + charsBeforeTab);
-		
+
 
 		// you may save the lexeme of the current token incrementally here
 		// you may also increment your line and column counters here
@@ -92,7 +88,7 @@ public final class Scanner {
 
 	private int checkSeperators() {
 		int retVal = -1;
-		
+
 		switch (currentChar) {
 			case '(':
 				accept();
@@ -127,7 +123,7 @@ public final class Scanner {
 				retVal = Token.COMMA;
 				break;
 			default:
-				
+
 		}
 		if (retVal > 0) {
 			currentSpelling.append(Token.spell(retVal));
@@ -138,7 +134,7 @@ public final class Scanner {
 	private int checkOperators() {
 		int retVal = -1;
 		// TODO: find a way to add spelling 
-		
+
 		switch(currentChar) { 
 			case '|':
 				if (inspectChar(1) == '|') {
@@ -147,6 +143,7 @@ public final class Scanner {
 					accept();
 					retVal = Token.OROR;
 				}
+				accept();
 				break;
 			case '+':
 				accept();
@@ -171,7 +168,7 @@ public final class Scanner {
 				}
 				else {
 					retVal = Token.NOT;
-                    accept();
+					accept();
 				}
 				break;
 			case '=':
@@ -180,7 +177,7 @@ public final class Scanner {
 					retVal = Token.EQEQ;
 				} else {
 					retVal = Token.EQ;
-                    accept();
+					accept();
 				}
 				break;
 			case '<':
@@ -189,7 +186,7 @@ public final class Scanner {
 					retVal = Token.LTEQ;
 				} else {
 					retVal = Token.LT;
-                    accept();
+					accept();
 				}
 				break;
 			case '>':
@@ -198,7 +195,7 @@ public final class Scanner {
 					retVal = Token.GTEQ;
 				} else {
 					retVal = Token.GT;
-                    accept();
+					accept();
 				}
 				break;
 			case '&':
@@ -209,7 +206,7 @@ public final class Scanner {
 				accept();
 				break;
 			default:
-				
+
 		}
 		if (retVal > 0) {
 			currentSpelling.append(Token.spell(retVal));
@@ -218,13 +215,13 @@ public final class Scanner {
 	}
 
 	private int checkIdentifiers() {
-		
+
 		// check for IDs
 		// has to start with letter or underscore
 		if (currentChar >= 'a' && currentChar <= 'z'
 				|| currentChar >= 'A' && currentChar <= 'Z'
 				|| currentChar == '_') {
-            currentSpelling.append(currentChar);
+			currentSpelling.append(currentChar);
 			accept();
 			while (true) {
 				// now numbers in ID are valid
@@ -232,7 +229,7 @@ public final class Scanner {
 						|| currentChar >= 'A' && currentChar <= 'Z'
 						|| currentChar >= '0' && currentChar <= '9'
 						|| currentChar == '_') {
-                    currentSpelling.append(currentChar);
+					currentSpelling.append(currentChar);
 					accept();
 					// the identifier spells a boolean value, 
 					if (currentSpelling.toString().equals("true") ||
@@ -245,13 +242,13 @@ public final class Scanner {
 				}
 			}
 		} else {
-			
+
 			return -1;
 		}
 	}
 
 	private char getEscapeChar(char ch) {
-		
+
 		char retVal = Character.MIN_VALUE;
 		if (ch == 'b') {
 			retVal = '\b';
@@ -270,14 +267,14 @@ public final class Scanner {
 		} else if (ch == '\\') {
 			retVal = '\\';
 		} else {
-			
+
 		}
 		return retVal;
 	}
 
 	private int checkLiterals() {
 		//TODO: boolean literals
-		
+
 		// TODO: this is checking for ID's, it should be checking for string literials 
 		boolean isFloat = false;
 		boolean isInt = false;
@@ -293,18 +290,18 @@ public final class Scanner {
 					return Token.STRINGLITERAL;
 				} else if (currentChar == '\\') {
 					if (escapeChars.contains(inspectChar(1))) {
-						
+
 						currentSpelling.append(getEscapeChar(inspectChar(1)));
 						accept();
 						continue;
 					} else {
 						String illegal_escape = new StringBuilder().append("").append(currentChar).append(inspectChar(1)).toString();
-						
+
 						errorReporter.reportError("%: illegal escape character", illegal_escape, sourcePos);
 						currentSpelling.append(currentChar);
 					}
 				} else {
-					
+
 					currentSpelling.append(currentChar);
 				}
 
@@ -313,7 +310,7 @@ public final class Scanner {
 			currentSpelling.deleteCharAt(currentSpelling.length()-1);
 			// accept once for the extra quotation
 			accept();
-			
+
 			return Token.STRINGLITERAL;
 		} else if (currentChar >= '0' && currentChar <= '9') {
 			retVal = Token.INTLITERAL;
@@ -352,22 +349,22 @@ public final class Scanner {
 		}
 
 		if (retVal < 0) {
-			
+
 		}
 		return retVal;
-			// first check for ints adding to the spelling, retVal=INT
-			// if dot or 'e/E' and digits after, valid add to spelling, retVal=FLOAT
-			// we can make them independnet if's, 
+		// first check for ints adding to the spelling, retVal=INT
+		// if dot or 'e/E' and digits after, valid add to spelling, retVal=FLOAT
+		// we can make them independnet if's, 
 	}
 
 	// TODO: this should return an int
 	private int checkSpecial() {
-		
+
 		if (currentChar == SourceFile.eof) {
 			currentSpelling.append(Token.spell(Token.EOF));
 			return Token.EOF;
 		} else {
-			
+
 			return -1;
 		}
 
@@ -375,7 +372,7 @@ public final class Scanner {
 
 	private enum Tokens {
 		SEPERATORS, OPERATORS, LITERALS,
-		IDENTIFIERS, KEYWORDS, SPECIAL
+			IDENTIFIERS, KEYWORDS, SPECIAL
 	}
 
 	private int tokenChecker(Tokens tokenType) {
@@ -393,7 +390,7 @@ public final class Scanner {
 			case SPECIAL:
 				return checkSpecial();
 			default:
-				
+
 				return -1;
 		}
 	}
@@ -405,17 +402,17 @@ public final class Scanner {
 			tokenID = tokenChecker(tokenType);
 			if (tokenID >= 0) {
 				if (currentChar != SourceFile.eof) {
-					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
+					tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 				}
 				return tokenID;
 			}
 		}
 
-		
-        // erroneous token spelling
-        if (currentSpelling.toString().equals("")) {
-            currentSpelling.append(currentChar);
-        }
+
+		// erroneous token spelling
+		if (currentSpelling.toString().equals("")) {
+			currentSpelling.append(currentChar);
+		}
 		// to flush the errenous curr char out
 		accept();
 		return Token.ERROR;
@@ -437,7 +434,7 @@ public final class Scanner {
 
 	void skipSpaceAndComments() {
 		// TODO: handle multiline comments
-		
+
 		// skipping whitespace
 		if (Character.isWhitespace(currentChar)) {
 			accept();
@@ -446,7 +443,7 @@ public final class Scanner {
 		// skipping comments
 		if (currentChar == '/') {
 			if (inspectChar(1) == '/') {
-				
+
 				// if we find '//' remove all chars until we hit LF or CR
 				while (currentChar != '\n' && currentChar != '\r') {
 					accept();
@@ -463,11 +460,11 @@ public final class Scanner {
 				skipSpaceAndComments();
 			} else if (inspectChar(1) == '*') {
 				// multiline comment
-				
+
 				accept(); accept();
 				while (true) {
 					if (currentChar == '*' && inspectChar(1) == '/') {
-						
+
 						accept(); accept();
 						skipSpaceAndComments();
 						break;
@@ -479,15 +476,15 @@ public final class Scanner {
 				}
 			}
 		} else if (currentChar == '\n' || currentChar == '\r') {
-			
+
 			// if the current token is a line terminator remove it
 			if (currentChar == '\r' && inspectChar(1) == '\n') {
-				
+
 				// if CRLF then remove both
 				accept();
 				accept();
 			} else {
-				
+
 				// if either only CR or LF remove one char
 				// TODO: I have no idea why I need two accepts here
 				accept();
@@ -498,19 +495,18 @@ public final class Scanner {
 	}
 
 	public Token getToken() {
+		// this would possibly be whitespace or the start of the next token
 		System.out.println("getToken(): the current char is " + currentChar);
 		Token tok;
 		int kind;
-		
-		
 
 		currentSpelling = new StringBuffer("");
 
 		skipSpaceAndComments();
 
-		sourcePos.charStart = sourcePos.charFinish + 1 ;
-        
-	    errorReporter = new ErrorReporter();
+		sourcePos.charStart = sourcePos.charFinish;
+
+		errorReporter = new ErrorReporter();
 
 		// skip white space and comments
 
