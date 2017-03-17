@@ -172,8 +172,6 @@ public final class Scanner {
 					accept();
 					accept();
 					retVal = Token.OROR;
-				} else {
-					accept();
 				}
 				break;
 			case '+':
@@ -233,8 +231,6 @@ public final class Scanner {
 				if (inspectChar(1) == '&') {
 					accept(); accept();
 					retVal = Token.ANDAND;
-				} else {
-					accept();
 				}
 				break;
 			default:
@@ -342,31 +338,38 @@ public final class Scanner {
 		// checking for decimal dot
 		if (currentChar == '.') {
 			// if int becomes float as soon as there is a dot
-			if (retVal == Token.INTLITERAL) {
-				retVal = Token.FLOATLITERAL;
-			}
 			if (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+				// take the dot
+				accept();
 				retVal = Token.FLOATLITERAL;
-				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+				while (currentChar >= '0' && currentChar <= '9') {
 					accept();
 				}
-				// accept, otherwise we'll get duplicate reading
+			} else if (retVal == Token.INTLITERAL) {
 				accept();
+				retVal = Token.FLOATLITERAL;
 			}
+			// accept, otherwise we'll get duplicate reading
 		}
 		// checking for exponentials
 		if (currentChar == 'e' || currentChar == 'E') {
+			// we definately have a number
+			if (inspectChar(2) >= '0' && inspectChar(2) <= '9' && (inspectChar(1) == '+' || inspectChar(1) == '-')) {
+				accept();
+			}
 			if (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
-				// look ahead one char, if number accept and add to spelling
-				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
+				if (retVal == Token.INTLITERAL || retVal == Token.FLOATLITERAL) {
 					accept();
-					// exponent only valid if int or float
-					if (retVal == Token.INTLITERAL || retVal == Token.FLOATLITERAL) {
-						retVal = Token.FLOATLITERAL;
+					// look ahead one char, if number accept and add to spelling
+					while (currentChar >= '0' && currentChar <= '9' || currentChar == '+' || currentChar == '-') {
+						accept();
+						// exponent only valid if int or float
+						if (retVal == Token.INTLITERAL || retVal == Token.FLOATLITERAL) {
+							retVal = Token.FLOATLITERAL;
+						}
+						// accept, otherwise we'll get duplicate reading
 					}
 				}
-				// accept, otherwise we'll get duplicate reading
-				accept();
 			}
 		}
 		return retVal;
@@ -423,10 +426,9 @@ public final class Scanner {
 			}
 		}
 		// tokenPos already set in accept() if newline character
-		if (currentChar != '\n') {
+		accept();
+		if (currentChar != '\n')
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
-		}
-
 
 		// TODO: this should never pass
 		// erroneous token spelling
