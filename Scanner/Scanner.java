@@ -13,11 +13,14 @@ public final class Scanner {
 
 	private SourceFile sourceFile;
 	private boolean debug;
+	private boolean currentCharIsEscape = false;
+	private boolean skipSpelling = false;
 
 	private ErrorReporter errorReporter;
-	private StringBuffer currentSpelling;
+	private StringBuffer currentSpelling = new StringBuffer(""); 
 	private char currentChar;
-	private SourcePosition sourcePos = new SourcePosition(1,1,1);
+	private char prevChar;
+	private SourcePosition sourcePos = new SourcePosition(1,1,0);
 	private SourcePosition tokenPos;
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
 	private int charsBeforeTab = 0;
@@ -26,7 +29,7 @@ public final class Scanner {
 	public Scanner(SourceFile source, ErrorReporter reporter) {
 		sourceFile = source;
 		errorReporter = reporter;
-		currentChar = sourceFile.getNextChar();
+		accept();
 		debug = false;
 
 		// you may initialise your counters for line and column numbers here
@@ -43,7 +46,28 @@ public final class Scanner {
 	// accept gets the next character from the source program.
 
 	private void accept() {
+		if (currentCharIsEscape) {
+			System.out.println("accept(): current char is escape");
+			// reset the flag
+			currentCharIsEscape = false;
+			// current char is backslash, make it actual escape char
+			currentChar = sourceFile.getNextChar();
+			// TODO: maybe just make this recurision?
+			sourcePos.charFinish++;
+			charsBeforeTab++;
+			// transform that letter to esacpe char literal
+			currentChar = getEscapeChar(currentChar);
+		}
+		prevChar = currentChar;
 		currentChar = sourceFile.getNextChar();
+		System.out.println("accept(): the prev char is " + prevChar);
+		if (skipSpelling) {
+			// reset the flag
+			skipSpelling = false;
+		} else {
+			if (prevChar != 0)
+				currentSpelling.append(prevChar);
+		}
 		System.out.println("accpet(): current char is " + currentChar);
 		// re
 		if (currentChar == '\t') {
@@ -59,9 +83,8 @@ public final class Scanner {
 			sourcePos.lineFinish++;
 			charsBeforeTab = 0;
 		} else if (currentChar == SourceFile.eof) {
-			sourcePos.lineFinish++;
 			sourcePos.charStart = sourcePos.charFinish = 1;
-			tokenPos = sourcePos;
+			tokenPos = new SourcePosition(sourcePos.lineFinish, 1, 1);
 		} else {
 			sourcePos.charFinish++;
 			charsBeforeTab++;
@@ -90,6 +113,7 @@ public final class Scanner {
 	}
 
 	private int checkSeperators() {
+		System.out.println("checkSeperators(): entered");
 		int retVal = -1;
 
 		switch (currentChar) {
@@ -128,13 +152,11 @@ public final class Scanner {
 			default:
 
 		}
-		if (retVal > 0) {
-			currentSpelling.append(Token.spell(retVal));
-		}
 		return retVal;
 	}
 
 	private int checkOperators() {
+		System.out.println("checkOperators(): entered");
 		int retVal = -1;
 		// TODO: find a way to add spelling 
 
@@ -213,20 +235,17 @@ public final class Scanner {
 			default:
 
 		}
-		if (retVal > 0) {
-			currentSpelling.append(Token.spell(retVal));
-		}
 		return retVal;
 	}
 
 	private int checkIdentifiers() {
+		System.out.println("checkIndentifiers(): entered");
 
 		// check for IDs
 		// has to start with letter or underscore
 		if (currentChar >= 'a' && currentChar <= 'z'
 				|| currentChar >= 'A' && currentChar <= 'Z'
 				|| currentChar == '_') {
-			currentSpelling.append(currentChar);
 			accept();
 			while (true) {
 				// now numbers in ID are valid
@@ -234,12 +253,11 @@ public final class Scanner {
 						|| currentChar >= 'A' && currentChar <= 'Z'
 						|| currentChar >= '0' && currentChar <= '9'
 						|| currentChar == '_') {
-					currentSpelling.append(currentChar);
 					accept();
 					// the identifier spells a boolean value, 
 					if (currentSpelling.toString().equals("true") ||
 							currentSpelling.toString().equals("false")) {
-						return Token.ID;
+						return Token.BOOLEANLITERAL;
 							}
 				} else {
 					// we didn't find a valid char for ID, return
@@ -278,98 +296,83 @@ public final class Scanner {
 	}
 
 	private int checkLiterals() {
-		//TODO: boolean literals
-
-		// TODO: this is checking for ID's, it should be checking for string literials 
+		System.out.println("checkLiterals(): entered");
 		boolean isFloat = false;
 		boolean isInt = false;
 		int retVal = -1;
 		if (currentChar == '"' ) {
-			// add to spelling until we find the terminting " keeping eating the chars
-			// TODO: handle escaping of quotation marks
-			do {
-				accept();
+			// skip the quotation 
+			skipSpelling = true;
+			accept();
+			while (currentChar != '"') {
 				// TODO: check for CRLF as well, maybe you might have to accept twice
 				if (currentChar == '\n' || currentChar == '\r') {
 					errorReporter.reportError("unterminated string", currentSpelling.toString(), sourcePos);
 					return Token.STRINGLITERAL;
 				} else if (currentChar == '\\') {
 					if (escapeChars.contains(inspectChar(1))) {
-
-						currentSpelling.append(getEscapeChar(inspectChar(1)));
-						accept();
-						continue;
+						currentCharIsEscape = true;
 					} else {
 						String illegal_escape = new StringBuilder().append("").append(currentChar).append(inspectChar(1)).toString();
-
 						errorReporter.reportError("%: illegal escape character", illegal_escape, sourcePos);
-						currentSpelling.append(currentChar);
 					}
-				} else {
-
-					currentSpelling.append(currentChar);
 				}
-
-			} while (currentChar != '"');
-			// get rid of the last quotation
-			currentSpelling.deleteCharAt(currentSpelling.length()-1);
-			// accept once for the extra quotation
+				accept();
+			}
+			// move forward once for the extra quotation
+			skipSpelling = true;
 			accept();
-
 			return Token.STRINGLITERAL;
-		} else if (currentChar >= '0' && currentChar <= '9') {
+		} 
+		// checking for int digits
+		if (currentChar >= '0' && currentChar <= '9') {
 			retVal = Token.INTLITERAL;
-			currentSpelling.append(currentChar);
 			accept();
 			while (currentChar >= '0' && currentChar <= '9') {
-				currentSpelling.append(currentChar);
 				accept();
 			}
 		}
+		// checking for decimal dot
 		if (currentChar == '.') {
+			// if int becomes float as soon as there is a dot
+			if (retVal == Token.INTLITERAL) {
+				retVal = Token.FLOATLITERAL;
+			}
 			if (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
-				currentSpelling.append(currentChar);
-				// look ahead one char, if number accept and add to spelling
+				retVal = Token.FLOATLITERAL;
 				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
 					accept();
-					currentSpelling.append(currentChar);
-					retVal = Token.FLOATLITERAL;
 				}
 				// accept, otherwise we'll get duplicate reading
 				accept();
 			}
 		}
+		// checking for exponentials
 		if (currentChar == 'e' || currentChar == 'E') {
 			if (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
-				currentSpelling.append(currentChar);
 				// look ahead one char, if number accept and add to spelling
 				while (inspectChar(1) >= '0' && inspectChar(1) <= '9') {
 					accept();
-					currentSpelling.append(currentChar);
-					retVal = Token.FLOATLITERAL;
+					// exponent only valid if int or float
+					if (retVal == Token.INTLITERAL || retVal == Token.FLOATLITERAL) {
+						retVal = Token.FLOATLITERAL;
+					}
 				}
 				// accept, otherwise we'll get duplicate reading
 				accept();
 			}
 		}
-
-		if (retVal < 0) {
-
-		}
 		return retVal;
-		// first check for ints adding to the spelling, retVal=INT
-		// if dot or 'e/E' and digits after, valid add to spelling, retVal=FLOAT
-		// we can make them independnet if's, 
 	}
 
 	// TODO: this should return an int
 	private int checkSpecial() {
+		System.out.println("checkSpecial(): entered");
 
 		if (currentChar == SourceFile.eof) {
 			currentSpelling.append(Token.spell(Token.EOF));
 			return Token.EOF;
 		} else {
-
 			return -1;
 		}
 
@@ -412,8 +415,10 @@ public final class Scanner {
 				return tokenID;
 			}
 		}
+		tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
 
 
+		// TODO: this should never pass
 		// erroneous token spelling
 		if (currentSpelling.toString().equals("")) {
 			currentSpelling.append(currentChar);
@@ -506,9 +511,12 @@ public final class Scanner {
 		Token tok;
 		int kind;
 
-		currentSpelling = new StringBuffer("");
 
 		skipSpaceAndComments();
+		System.out.println("getToken(): exited skipSpaceAndComments():" );
+		
+		// gotten rid of white space start token spelling
+		currentSpelling = new StringBuffer("");
 
 		sourcePos.charStart = sourcePos.charFinish;
 
