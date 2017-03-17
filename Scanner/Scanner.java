@@ -13,15 +13,20 @@ public final class Scanner {
 
 	private SourceFile sourceFile;
 	private boolean debug;
+	private boolean printDebug = false;
 	private boolean currentCharIsEscape = false;
 	private boolean skipSpelling = false;
 
 	private ErrorReporter errorReporter;
 	private StringBuffer currentSpelling = new StringBuffer(""); 
+
 	private char currentChar;
 	private char prevChar;
+
 	private SourcePosition sourcePos = new SourcePosition(1,1,0);
 	private SourcePosition tokenPos;
+	private SourcePosition errorPos;
+
 	private List<Character> escapeChars = new ArrayList<Character>(Arrays.asList('b', 'f', 'n', 'r', 't', '\'', '"', '\\'));
 	private int charsBeforeTab = 0;
 	// =========================================================
@@ -47,7 +52,7 @@ public final class Scanner {
 
 	private void accept() {
 		if (currentCharIsEscape) {
-			System.out.println("accept(): current char is escape");
+			if (printDebug) System.out.println("accept(): current char is escape");
 			// reset the flag
 			currentCharIsEscape = false;
 			// current char is backslash, make it actual escape char
@@ -60,7 +65,7 @@ public final class Scanner {
 		}
 		prevChar = currentChar;
 		currentChar = sourceFile.getNextChar();
-		System.out.println("accept(): the prev char is " + prevChar);
+		if (printDebug) System.out.println("accept(): the prev char is " + prevChar);
 		if (skipSpelling) {
 			// reset the flag
 			skipSpelling = false;
@@ -68,16 +73,16 @@ public final class Scanner {
 			if (prevChar != 0)
 				currentSpelling.append(prevChar);
 		}
-		System.out.println("accpet(): current char is " + currentChar);
+		if (printDebug) System.out.println("accpet(): current char is " + currentChar);
 		// re
 		if (currentChar == '\t') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
-			System.out.println("accept(): tab characterr");
+			if (printDebug) System.out.println("accept(): tab characterr");
 			sourcePos.charFinish += getTabLength();
 			charsBeforeTab = 0;
 		} else if (currentChar == '\n') {
 			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
-			System.out.println("accept(): newline characterr");
+			if (printDebug) System.out.println("accept(): newline characterr");
 			sourcePos.charStart = 1;
 			sourcePos.charFinish = 0;
 			sourcePos.lineFinish++;
@@ -89,9 +94,9 @@ public final class Scanner {
 			sourcePos.charFinish++;
 			charsBeforeTab++;
 		}
-		System.out.println("accept(): charStart is " + sourcePos.charStart);
-		System.out.println("accpet(): charFinish is " + sourcePos.charFinish);
-		System.out.println("accpet(): number of chars before tab is " + charsBeforeTab);
+		if (printDebug) System.out.println("accept(): charStart is " + sourcePos.charStart);
+		if (printDebug) System.out.println("accpet(): charFinish is " + sourcePos.charFinish);
+		if (printDebug) System.out.println("accpet(): number of chars before tab is " + charsBeforeTab);
 
 
 		// you may save the lexeme of the current token incrementally here
@@ -113,7 +118,7 @@ public final class Scanner {
 	}
 
 	private int checkSeperators() {
-		System.out.println("checkSeperators(): entered");
+		if (printDebug) System.out.println("checkSeperators(): entered");
 		int retVal = -1;
 
 		switch (currentChar) {
@@ -156,7 +161,7 @@ public final class Scanner {
 	}
 
 	private int checkOperators() {
-		System.out.println("checkOperators(): entered");
+		if (printDebug) System.out.println("checkOperators(): entered");
 		int retVal = -1;
 		// TODO: find a way to add spelling 
 
@@ -239,7 +244,7 @@ public final class Scanner {
 	}
 
 	private int checkIdentifiers() {
-		System.out.println("checkIndentifiers(): entered");
+		if (printDebug) System.out.println("checkIndentifiers(): entered");
 
 		// check for IDs
 		// has to start with letter or underscore
@@ -296,7 +301,7 @@ public final class Scanner {
 	}
 
 	private int checkLiterals() {
-		System.out.println("checkLiterals(): entered");
+		if (printDebug) System.out.println("checkLiterals(): entered");
 		boolean isFloat = false;
 		boolean isInt = false;
 		int retVal = -1;
@@ -307,14 +312,16 @@ public final class Scanner {
 			while (currentChar != '"') {
 				// TODO: check for CRLF as well, maybe you might have to accept twice
 				if (currentChar == '\n' || currentChar == '\r') {
-					errorReporter.reportError("unterminated string", currentSpelling.toString(), sourcePos);
+					errorPos = new SourcePosition(sourcePos.lineFinish-1, tokenPos.charStart, tokenPos.charStart);
+					errorReporter.reportError("%: unterminated string", currentSpelling.toString(), errorPos);
 					return Token.STRINGLITERAL;
 				} else if (currentChar == '\\') {
 					if (escapeChars.contains(inspectChar(1))) {
 						currentCharIsEscape = true;
 					} else {
 						String illegal_escape = new StringBuilder().append("").append(currentChar).append(inspectChar(1)).toString();
-						errorReporter.reportError("%: illegal escape character", illegal_escape, sourcePos);
+						errorPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
+						errorReporter.reportError("%: illegal escape character", illegal_escape, errorPos);
 					}
 				}
 				accept();
@@ -367,7 +374,7 @@ public final class Scanner {
 
 	// TODO: this should return an int
 	private int checkSpecial() {
-		System.out.println("checkSpecial(): entered");
+		if (printDebug) System.out.println("checkSpecial(): entered");
 
 		if (currentChar == SourceFile.eof) {
 			currentSpelling.append(Token.spell(Token.EOF));
@@ -415,7 +422,10 @@ public final class Scanner {
 				return tokenID;
 			}
 		}
-		tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
+		// tokenPos already set in accept() if newline character
+		if (currentChar != '\n') {
+			tokenPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish-1);
+		}
 
 
 		// TODO: this should never pass
@@ -443,7 +453,7 @@ public final class Scanner {
 	}
 
 	void skipSpaceAndComments() {
-		System.out.println("skipSpaceAndComments(): entered");
+		if (printDebug) System.out.println("skipSpaceAndComments(): entered");
 		// TODO: handle multiline comments
 
 		// skipping whitespace
@@ -480,7 +490,8 @@ public final class Scanner {
 						skipSpaceAndComments();
 						break;
 					} else if (currentChar == SourceFile.eof) {
-						errorReporter.reportError("Unterminated comment", "/**/", sourcePos);
+						errorPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
+						errorReporter.reportError("Unterminated comment", "/**/", errorPos);
 						break;
 					}
 					accept();
@@ -507,13 +518,13 @@ public final class Scanner {
 
 	public Token getToken() {
 		// this would possibly be whitespace or the start of the next token
-		System.out.println("getToken(): the current char is " + currentChar);
+		if (printDebug) System.out.println("getToken(): the current char is " + currentChar);
 		Token tok;
 		int kind;
 
 
 		skipSpaceAndComments();
-		System.out.println("getToken(): exited skipSpaceAndComments():" );
+		if (printDebug) System.out.println("getToken(): exited skipSpaceAndComments():" );
 		
 		// gotten rid of white space start token spelling
 		currentSpelling = new StringBuffer("");
