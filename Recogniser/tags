@@ -1,0 +1,44 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+Recogniser	Recogniser.java	/^  public Recogniser (Scanner lexer, ErrorReporter reporter) {$/;"	m	class:Recogniser
+Recogniser	Recogniser.java	/^public class Recogniser {$/;"	c
+SyntaxError	SyntaxError.java	/^  SyntaxError (String s) {$/;"	m	class:SyntaxError
+SyntaxError	SyntaxError.java	/^  SyntaxError() {$/;"	m	class:SyntaxError
+SyntaxError	SyntaxError.java	/^class SyntaxError extends Exception {$/;"	c
+VC	vc.java	/^package VC;$/;"	p
+VC.Recogniser	Recogniser.java	/^package VC.Recogniser;$/;"	p
+VC.Recogniser	SyntaxError.java	/^package VC.Recogniser;$/;"	p
+accept	Recogniser.java	/^  void accept() {$/;"	m	class:Recogniser
+acceptOperator	Recogniser.java	/^  void acceptOperator() throws SyntaxError {$/;"	m	class:Recogniser
+currentToken	Recogniser.java	/^  private Token currentToken;$/;"	f	class:Recogniser	file:
+errorReporter	Recogniser.java	/^  private ErrorReporter errorReporter;$/;"	f	class:Recogniser	file:
+inputFilename	vc.java	/^    private static String inputFilename; $/;"	f	class:vc	file:
+main	vc.java	/^    public static void main(String[] args) {$/;"	m	class:vc
+match	Recogniser.java	/^  void match(int tokenExpected) throws SyntaxError {$/;"	m	class:Recogniser
+parseAdditiveExpr	Recogniser.java	/^  void parseAdditiveExpr() throws SyntaxError {$/;"	m	class:Recogniser
+parseAssignExpr	Recogniser.java	/^  void parseAssignExpr() throws SyntaxError {$/;"	m	class:Recogniser
+parseBooleanLiteral	Recogniser.java	/^  void parseBooleanLiteral() throws SyntaxError {$/;"	m	class:Recogniser
+parseCompoundStmt	Recogniser.java	/^  void parseCompoundStmt() throws SyntaxError {$/;"	m	class:Recogniser
+parseContinueStmt	Recogniser.java	/^  void parseContinueStmt() throws SyntaxError {$/;"	m	class:Recogniser
+parseExpr	Recogniser.java	/^  void parseExpr() throws SyntaxError {$/;"	m	class:Recogniser
+parseExprStmt	Recogniser.java	/^  void parseExprStmt() throws SyntaxError {$/;"	m	class:Recogniser
+parseFloatLiteral	Recogniser.java	/^  void parseFloatLiteral() throws SyntaxError {$/;"	m	class:Recogniser
+parseFuncDecl	Recogniser.java	/^  void parseFuncDecl() throws SyntaxError {$/;"	m	class:Recogniser
+parseIdent	Recogniser.java	/^  void parseIdent() throws SyntaxError {$/;"	m	class:Recogniser
+parseIntLiteral	Recogniser.java	/^  void parseIntLiteral() throws SyntaxError {$/;"	m	class:Recogniser
+parseMultiplicativeExpr	Recogniser.java	/^  void parseMultiplicativeExpr() throws SyntaxError {$/;"	m	class:Recogniser
+parsePrimaryExpr	Recogniser.java	/^  void parsePrimaryExpr() throws SyntaxError {$/;"	m	class:Recogniser
+parseProgram	Recogniser.java	/^  public void parseProgram() {$/;"	m	class:Recogniser
+parseStmt	Recogniser.java	/^  void parseStmt() throws SyntaxError {$/;"	m	class:Recogniser
+parseStmtList	Recogniser.java	/^  void parseStmtList() throws SyntaxError {$/;"	m	class:Recogniser
+parseUnaryExpr	Recogniser.java	/^  void parseUnaryExpr() throws SyntaxError {$/;"	m	class:Recogniser
+recogniser	vc.java	/^    private static Recogniser recogniser;$/;"	f	class:vc	file:
+reporter	vc.java	/^    private static ErrorReporter reporter;$/;"	f	class:vc	file:
+scanner	Recogniser.java	/^  private Scanner scanner;$/;"	f	class:Recogniser	file:
+scanner	vc.java	/^    private static Scanner scanner;$/;"	f	class:vc	file:
+syntacticError	Recogniser.java	/^  void syntacticError(String messageTemplate, String tokenQuoted) throws SyntaxError {$/;"	m	class:Recogniser
+vc	vc.java	/^public class vc {$/;"	c
