@@ -492,8 +492,8 @@ public final class Scanner {
 						skipSpaceAndComments();
 						break;
 					} else if (currentChar == SourceFile.eof) {
-						errorPos = new SourcePosition(sourcePos.lineFinish, sourcePos.charStart, sourcePos.charFinish);
-						errorReporter.reportError("Unterminated comment", "/**/", errorPos);
+						errorPos = new SourcePosition(sourcePos.lineFinish-1, tokenPos.charFinish, tokenPos.charFinish);
+						errorReporter.reportError("unterminated comment", "/**/", errorPos);
 						break;
 					}
 					accept();
