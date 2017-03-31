@@ -141,9 +141,9 @@ public class Recogniser {
 
 		try {
 			// TODO
-			parseType();
-			parseIdent();
-			while (currentInFirst("decl")) {
+			while (currentInFirst("program")) {
+				parseType();
+				parseIdent();
 				parseDecl();
 			}
 			if (currentToken.kind != Token.EOF) {
@@ -199,6 +199,7 @@ public class Recogniser {
 				parseInitDeclarator();
 			}
 		}
+		match(Token.SEMICOLON);
 	}
 
 	void parseFuncDecl() throws SyntaxError {
@@ -322,9 +323,9 @@ public class Recogniser {
 
 	void parseIfStmt() throws SyntaxError {
 		match(Token.IF);
-		match(Token.LCURLY);
+		match(Token.LPAREN);
 		parseExpr();
-		match(Token.RCURLY);
+		match(Token.RPAREN);
 		parseStmt();
 		if (currentToken.kind == Token.ELSE) {
 			match(Token.ELSE);
@@ -466,9 +467,10 @@ public class Recogniser {
 			match(Token.GT);
 			parseAdditiveExpr();
 			break;
-		default:
+		case Token.GTEQ:
 			match(Token.GTEQ);
 			parseAdditiveExpr();
+		default:
 			break;
 		}
 
@@ -511,6 +513,13 @@ public class Recogniser {
 		switch (currentToken.kind) {
 			case Token.ID:
 				parseIdent();
+				if (currentToken.kind == Token.LBRACKET) {
+					match(Token.LBRACKET);
+					parseExpr();
+					match(Token.RBRACKET);
+				} else if(currentInFirst("arg-list")) {
+					parseArgList();
+				}
 				break;
 			case Token.LPAREN:
 				{
