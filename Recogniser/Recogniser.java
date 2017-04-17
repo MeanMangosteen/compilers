@@ -72,14 +72,14 @@ public class Recogniser {
 		first.put("identifier", new Integer[]{ID});
 		first.put("compound-stmt", new Integer[]{LCURLY});
 		first.put("stmt", new Integer[]{LCURLY, IF, FOR, WHILE, BREAK, CONTINUE, RETURN, PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL,
-			BOOLEANLITERAL, STRINGLITERAL});
+			BOOLEANLITERAL, STRINGLITERAL, SEMICOLON});
 		first.put("if-stmt", new Integer[]{IF});
 		first.put("for-stmt", new Integer[]{FOR});
 		first.put("while-stmt", new Integer[]{WHILE});
 		first.put("break-stmt", new Integer[]{BREAK});
 		first.put("continue-stmt", new Integer[]{CONTINUE});
 		first.put("return-stmt", new Integer[]{RETURN});
-		first.put("expr-stmt", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL, COMMA});
+		first.put("expr-stmt", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL, COMMA, SEMICOLON});
 		first.put("expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
 		first.put("assignment-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
 		first.put("cond-or-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
@@ -187,19 +187,18 @@ public class Recogniser {
 			}
 			match(Token.RBRACKET);
 			break;
-		case Token.EQ:
+		}
+		if(currentToken.kind == Token.EQ) {
 			match(Token.EQ);
 			// TODO
-			parseIdent();
-			break;
-		case Token.COMMA:
-			while (currentToken.kind == Token.COMMA) {
-				match(Token.COMMA);
-				// TODO
-				parseInitDeclarator();
-			}
+			parseInitialiser();
+		}
+		if (currentToken.kind == Token.COMMA) {
+			match(Token.COMMA);
+			parseInitDeclaratorList();
 		}
 		match(Token.SEMICOLON);
+		
 	}
 
 	void parseFuncDecl() throws SyntaxError {
@@ -422,12 +421,16 @@ public class Recogniser {
 
 	void parseAssignExpr() throws SyntaxError {
 		parseCondOrExpr();
+		while (currentToken.kind == Token.EQ) {
+			match(Token.EQ);
+			parseCondOrExpr();
+		}
 	}
 	
 	void parseCondOrExpr() throws SyntaxError {
 		parseCondAndExpr();
-		while (currentToken.kind == Token.EQ) {
-			match(Token.EQ);
+		while (currentToken.kind == Token.OROR) {
+			match(Token.OROR);
 			parseCondAndExpr();
 		}
 	}
@@ -560,7 +563,7 @@ public class Recogniser {
 	void parseProperParaList() throws SyntaxError {
 		// TODO
 		parseParaDecl();
-		if (currentToken.kind == Token.COMMA) {
+		while (currentToken.kind == Token.COMMA) {
 			match(Token.COMMA);
 			parseParaDecl();
 		}
