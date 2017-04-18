@@ -65,7 +65,6 @@ public class Recogniser {
 	private Scanner scanner;
 	private ErrorReporter errorReporter;
 	private Token currentToken;
-	private Token previousToken;
 
 	public Recogniser (Scanner lexer, ErrorReporter reporter) {
 		scanner = lexer;
@@ -80,7 +79,6 @@ public class Recogniser {
 
 	void match(int tokenExpected) throws SyntaxError {
 		if (currentToken.kind == tokenExpected) {
-			previousToken = currentToken;
 			currentToken = scanner.getToken();
 		} else {
 			syntacticError("\"%\" expected here", Token.spell(tokenExpected));
@@ -89,7 +87,6 @@ public class Recogniser {
 
 	// accepts the current token and fetches the next
 	void accept() {
-		previousToken = currentToken;
 		currentToken = scanner.getToken();
 	}
 
@@ -109,9 +106,11 @@ public class Recogniser {
 	public void parseProgram() {
 
 		try {
-			parseType();
-			parseIdent();
-			parseDecl();
+			while (currentToken.kind != Token.EOF) {
+				parseType();
+				parseIdent();
+				parseDecl();
+			}
 			if (currentToken.kind != Token.EOF) {
 				syntacticError("\"%\" wrong result type for a function", currentToken.spelling);
 			}
@@ -297,7 +296,7 @@ public class Recogniser {
 			parseExpr();
 		}
 		match(Token.SEMICOLON);
-		if (currentToken.kind != Token.SEMICOLON) {
+		if (currentToken.kind != Token.RPAREN) {
 			parseExpr();
 		}
 		match(Token.RPAREN);
@@ -473,7 +472,7 @@ public class Recogniser {
 					match(Token.LBRACKET);
 					parseExpr();
 					match(Token.RBRACKET);
-				} else {
+				} else if (currentToken.kind == Token.LPAREN){
 					parseArgList();
 				}
 				break;
