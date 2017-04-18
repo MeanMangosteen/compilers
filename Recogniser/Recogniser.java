@@ -58,47 +58,14 @@ public class Recogniser {
 	private static final Map<String, Integer[]> first;
 	static {
 		first = new HashMap<String, Integer[]>();
-		first.put("program", new Integer[]{VOID, BOOLEAN, INT, FLOAT});
-		first.put("decl", new Integer[]{LPAREN, LBRACKET, EQ, COMMA});
-		first.put("func-decl", new Integer[]{VOID, BOOLEAN, INT, FLOAT});
-		first.put("func-decl-new", new Integer[]{LPAREN});
 		first.put("var-decl", new Integer[]{VOID, BOOLEAN, INT, FLOAT});
-		first.put("var-decl-new", new Integer[]{LBRACKET, EQ, COMMA});
-		first.put("init-declarator-list", new Integer[]{ID});
-		first.put("init-declarator", new Integer[]{ID});
-		first.put("declarator", new Integer[]{ID});
-		first.put("initialiser", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL, LCURLY});
-		first.put("type", new Integer[]{VOID, BOOLEAN, INT, FLOAT});
-		first.put("identifier", new Integer[]{ID});
-		first.put("compound-stmt", new Integer[]{LCURLY});
 		first.put("stmt", new Integer[]{LCURLY, IF, FOR, WHILE, BREAK, CONTINUE, RETURN, PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL,
 			BOOLEANLITERAL, STRINGLITERAL, SEMICOLON});
-		first.put("if-stmt", new Integer[]{IF});
-		first.put("for-stmt", new Integer[]{FOR});
-		first.put("while-stmt", new Integer[]{WHILE});
-		first.put("break-stmt", new Integer[]{BREAK});
-		first.put("continue-stmt", new Integer[]{CONTINUE});
-		first.put("return-stmt", new Integer[]{RETURN});
-		first.put("expr-stmt", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL, COMMA, SEMICOLON});
-		first.put("expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("assignment-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("cond-or-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("cond-and-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("equality-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("rel-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("additive-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("multiplicative-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("primary-expr", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("para-list", new Integer[]{LPAREN});
-		first.put("proper-para-list", new Integer[]{VOID, BOOLEAN, INT, FLOAT});
-		first.put("para-decl", new Integer[]{VOID, BOOLEAN, INT, FLOAT});
-		first.put("arg-list", new Integer[]{LPAREN});
-		first.put("proper-arg-list", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
-		first.put("arg", new Integer[]{PLUS, MINUS, NOT, ID, LPAREN, INTLITERAL, FLOATLITERAL, BOOLEANLITERAL, STRINGLITERAL});
 	}
 	private Scanner scanner;
 	private ErrorReporter errorReporter;
 	private Token currentToken;
+	private Token previousToken;
 
 	public Recogniser (Scanner lexer, ErrorReporter reporter) {
 		scanner = lexer;
@@ -113,6 +80,7 @@ public class Recogniser {
 
 	void match(int tokenExpected) throws SyntaxError {
 		if (currentToken.kind == tokenExpected) {
+			previousToken = currentToken;
 			currentToken = scanner.getToken();
 		} else {
 			syntacticError("\"%\" expected here", Token.spell(tokenExpected));
@@ -121,6 +89,7 @@ public class Recogniser {
 
 	// accepts the current token and fetches the next
 	void accept() {
+		previousToken = currentToken;
 		currentToken = scanner.getToken();
 	}
 
@@ -140,12 +109,9 @@ public class Recogniser {
 	public void parseProgram() {
 
 		try {
-			// TODO
-			while (currentInFirst("program")) {
-				parseType();
-				parseIdent();
-				parseDecl();
-			}
+			parseType();
+			parseIdent();
+			parseDecl();
 			if (currentToken.kind != Token.EOF) {
 				syntacticError("\"%\" wrong result type for a function", currentToken.spelling);
 			}
@@ -156,11 +122,9 @@ public class Recogniser {
 	// ========================== DECLARATIONS ========================
 
 	void parseDecl() throws SyntaxError {
-		if (currentInFirst("func-decl-new")) {
-			// TODO
+		if (currentToken.kind == Token.LPAREN) {
 			parseFuncDeclNew();
 		} else {
-			//TODO
 			parseVarDeclNew();
 		}
 	}
@@ -190,7 +154,6 @@ public class Recogniser {
 		}
 		if(currentToken.kind == Token.EQ) {
 			match(Token.EQ);
-			// TODO
 			parseInitialiser();
 		}
 		if (currentToken.kind == Token.COMMA) {
@@ -212,7 +175,6 @@ public class Recogniser {
 		parseDeclarator();
 		if (currentToken.kind == Token.EQ) {
 			match(Token.EQ);
-			// TODO
 			parseInitialiser();
 		}
 	}
@@ -239,7 +201,6 @@ public class Recogniser {
 	void parseInitialiser() throws SyntaxError {
 		if (currentToken.kind == Token.LCURLY) {
 			match(Token.LCURLY);
-			// TODO
 			parseExpr();
 			while (currentToken.kind == Token.COMMA) {
 				match(Token.COMMA);
@@ -279,7 +240,6 @@ public class Recogniser {
 
 		match(Token.LCURLY);
 		while (currentInFirst("var-decl")) {
-			//TODO	
 			parseVarDecl();
 
 		}
@@ -295,25 +255,19 @@ public class Recogniser {
 	}
 
 	void parseStmt() throws SyntaxError {
-		if (currentInFirst("compound-stmt")) {
+		if (currentToken.kind == Token.LCURLY) {
 			parseCompoundStmt();
-		} else if (currentInFirst("if-stmt")) {
-			// TODO
+		} else if (currentToken.kind == Token.IF) {
 			parseIfStmt();
-		} else if (currentInFirst("for-stmt")) {
-			//TODO
+		} else if (currentToken.kind == Token.FOR) {
 			parseForStmt();
-		} else if (currentInFirst("while-stmt")) {
-			//TODO
+		} else if (currentToken.kind == Token.WHILE) {
 			parseWhileStmt();
-		} else if (currentInFirst("continue-stmt")) {
-			//TODO
+		} else if (currentToken.kind == Token.CONTINUE) {
 			parseContinueStmt();
-		} else if (currentInFirst("break-stmt")) {
-			//TODO
+		} else if (currentToken.kind == Token.BREAK) {
 			parseBreakStmt();
-		} else if (currentInFirst("return-stmt")) {
-			//TODO
+		} else if (currentToken.kind == Token.RETURN) {
 			parseReturnStmt();
 		} else {
 			parseExprStmt();
@@ -335,15 +289,15 @@ public class Recogniser {
 	void parseForStmt() throws SyntaxError {
 		match(Token.FOR);
 		match(Token.LPAREN);
-		if (currentInFirst("expr")) {
+		if (currentToken.kind != Token.SEMICOLON) {
 			parseExpr();
 		}
 		match(Token.SEMICOLON);
-		if (currentInFirst("expr")) {
+		if (currentToken.kind != Token.SEMICOLON) {
 			parseExpr();
 		}
 		match(Token.SEMICOLON);
-		if (currentInFirst("expr")) {
+		if (currentToken.kind != Token.SEMICOLON) {
 			parseExpr();
 		}
 		match(Token.RPAREN);
@@ -353,7 +307,6 @@ public class Recogniser {
 	void parseWhileStmt() throws SyntaxError {
 		match(Token.WHILE);
 		match(Token.LPAREN);
-		//TODO
 		parseExpr();
 		match(Token.RPAREN);
 		parseStmt();
@@ -372,7 +325,7 @@ public class Recogniser {
 
 	void parseReturnStmt() throws SyntaxError {
 		match(Token.RETURN);
-		if (currentInFirst("expr")) {
+		if (currentToken.kind != Token.SEMICOLON) {
 			parseExpr();
 		}
 		match(Token.SEMICOLON);
@@ -380,7 +333,7 @@ public class Recogniser {
 
 	void parseExprStmt() throws SyntaxError {
 
-		if (currentInFirst("expr")) {
+		if (currentToken.kind != Token.SEMICOLON) {
 			parseExpr();
 		}
 		match(Token.SEMICOLON);
@@ -520,7 +473,7 @@ public class Recogniser {
 					match(Token.LBRACKET);
 					parseExpr();
 					match(Token.RBRACKET);
-				} else if(currentInFirst("arg-list")) {
+				} else {
 					parseArgList();
 				}
 				break;
@@ -554,14 +507,13 @@ public class Recogniser {
 	
 	void parseParaList() throws SyntaxError {
 		match(Token.LPAREN);
-		if (currentInFirst("proper-para-list")) {
+		if (currentToken.kind != Token.RPAREN) {
 			parseProperParaList();
 		}
 		match(Token.RPAREN);
 	}
 
 	void parseProperParaList() throws SyntaxError {
-		// TODO
 		parseParaDecl();
 		while (currentToken.kind == Token.COMMA) {
 			match(Token.COMMA);
@@ -571,13 +523,12 @@ public class Recogniser {
 
 	void parseParaDecl() throws SyntaxError {
 		parseType();
-		// TODO
 		parseDeclarator();
 	}
 
 	void parseArgList() throws SyntaxError {
 		match(Token.LPAREN);
-		if (currentInFirst("proper-arg-list")) {
+		if (currentToken.kind != Token.RPAREN) {
 			parseProperArgList();
 		}
 		match(Token.RPAREN);
