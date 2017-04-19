@@ -55,6 +55,7 @@ import VC.ASTs.*;
 
 import static VC.Scanner.Token.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -144,10 +145,8 @@ public class Parser {
 		start(programPos);
 
 		try {
-			while (currentToken.kind != Token.EOF) {
-				List l = parseDecl();
-			}
 			finish(programPos);
+			List dlAST = parseDeclList();
 			programAST = new Program(dlAST, programPos); 
 			if (currentToken.kind != Token.EOF) {
 				syntacticError("\"%\" unknown type", currentToken.spelling);
@@ -159,25 +158,57 @@ public class Parser {
 
 	// ========================== DECLARATIONS ========================
 
-	List parseDecl() throws SyntaxError {
-		SourcePosition declPos = new SourcePosition();
-		Type t = parseType();
-		Ident i = parseIdent();
-		if (currentToken.kind == Token.LPAREN) {
-			parseFuncDeclNew(t, i, declPos);
+	/* TODO: this will have to handle array from parse decl
+	 * 		 helper function to create AST if array > 1
+	 */
+	List parseDeclList() throws SyntaxError {
+		SourcePosition declListPos = new SourcePosition();
+		java.util.List<Decl> declArray = new ArrayList<Decl>();
+		DeclList declChild = null;
+		List declList = new EmptyDeclList(dummyPos);
+		List declListChild;
+		
+		/* parse either global variable or funcion declaration until EOF */
+		if (currentToken.kind == Token.EOF) {
+			return new EmptyDeclList(dummyPos);
 		} else {
-			parseVarDeclNew();
+			declChild = parseDecl();
+			declChild.DL = parseDeclList();
 		}
+
+		return declChild;
 	}
 	
-	List FuncDeclNew(Type t, Ident i, SourcePosition s) throws SyntaxError {
+	
+
+	/* TODO: this will also have to return an array */
+	DeclList parseDecl() throws SyntaxError {
+		SourcePosition declPos = new SourcePosition();
+		start(declPos);
+		Type t = parseType();
+		Ident i = parseIdent();
+		Decl dec;
+		DeclList declList;
+		if (currentToken.kind == Token.LPAREN) {
+			declList = parseFuncDeclNew(t, i, declPos);
+		} else {
+			declList = parseVarDeclNew(t, i, declPos);
+		}
+		
+		return declList;
+	}
+	
+	DeclList parseFuncDeclNew(Type t, Ident i, SourcePosition s) throws SyntaxError {
 		List paraList = parseParaList();
 		Stmt cmpStmt = parseCompoundStmt();
+		Decl fDecl = new FuncDecl(t, i, paraList, cmpStmt, s);
 		finish(s);
-		List fDecl = new FuncDecl(t, i, paraList, cmpStmt, s);
-		return fDecl;
+		List declList = new DeclList(fDecl, new EmptyDeclList(dummyPos), s);
+		return ((DeclList) declList);
 		
 	}
+	
+	
 
 	List parseFuncDeclList() throws SyntaxError {
 		List dlAST = null;
@@ -218,6 +249,124 @@ public class Parser {
 		return fAST;
 	}
 
+	    DeclList parseVarDeclNew(Type t, Ident i, SourcePosition s) throws SyntaxError {
+	    DeclList declList;
+		GlobalVarDecl var;
+		Type varType = t;
+		Expr varExp = new EmptyExpr(dummyPos);
+		SourcePosition varPos = new SourcePosition();
+
+		/* parsing declarator */
+		start(varPos);
+		if (currentToken.kind == Token.LBRACKET) {
+			Expr arrayIntExp = new EmptyExpr(dummyPos);
+			match(Token.LBRACKET);
+			if (currentToken.kind == Token.INTLITERAL) {
+				IntLiteral intLit = parseIntLiteral();
+				arrayIntExp = new IntExpr(intLit, s);
+			}
+			match(Token.RBRACKET);
+			finish(s);
+			varType = new ArrayType(t, arrayIntExp, s);
+		}
+		if(currentToken.kind == Token.EQ) {
+			acceptOperator();
+			varExp = parseInitialiser();
+		}
+		finish(varPos);
+
+		var = new GlobalVarDecl(varType, i, varExp, varPos);
+
+		List commaDeclList = new EmptyDeclList(dummyPos);
+		if (currentToken.kind == Token.COMMA) {
+			match(Token.COMMA);
+			/* this will return and declList*/
+			commaDeclList = parseInitDeclaratorList(t);
+
+		}
+		match(Token.SEMICOLON);
+		
+		declList = new DeclList(var, commaDeclList, varPos);
+		return declList;
+	}
+	
+	List parseInitDeclaratorList(Type varType) throws SyntaxError {
+		SourcePosition declListPos = new SourcePosition();
+		DeclList declList;
+		Decl var;
+		start(declListPos);
+		if (currentToken.kind != Token.COMMA) {
+			return new EmptyDeclList(dummyPos);
+		}
+		/* get all the other (potential) nodes in ast */
+		finish(declListPos);
+		match(Token.COMMA);
+		var = parseInitDeclarator(varType);
+		declList = new DeclList(var, new EmptyDeclList(dummyPos), declListPos);
+		declList.DL = parseInitDeclaratorList(varType);
+		
+		return declList;
+	}
+
+	Decl parseInitDeclarator(Type varType) throws SyntaxError {
+		Decl var;
+		Expr varExp = new EmptyExpr(dummyPos); 
+		var = parseDeclarator(varType);
+		if (currentToken.kind == Token.EQ) {
+			acceptOperator();
+			varExp = parseInitialiser();
+		}
+		/* TODO */
+		((GlobalVarDecl) var).E = varExp;
+		return var;
+	}
+	
+	Decl parseDeclarator(Type varType) throws SyntaxError {
+		SourcePosition declPos = varType.position;
+		Decl var;
+		Expr arrayIntExp = new EmptyExpr(dummyPos);
+
+		Ident varIdent = parseIdent();
+		if (currentToken.kind == Token.LBRACKET) {
+			match(Token.LBRACKET);
+			if (currentToken.kind == Token.INTLITERAL) {
+				IntLiteral intLit = parseIntLiteral();
+				arrayIntExp = new IntExpr(intLit, previousTokenPosition);
+			}
+			match(Token.RBRACKET);
+			finish(declPos);
+			varType = new ArrayType(varType, arrayIntExp, declPos);
+		}
+		/* TODO: make local vs global depending on optional arg */
+		var = new GlobalVarDecl(varType, varIdent, new EmptyExpr(dummyPos), dummyPos);
+		return var;
+	}
+	
+	Expr parseInitialiser() throws SyntaxError {
+		Expr fullExp, partialExp;
+		SourcePosition s = new SourcePosition();
+		if (currentToken.kind == Token.LCURLY) {
+			List expList;
+			match(Token.LCURLY);
+			start(s);
+			partialExp = parseExpr();
+			finish(s);
+			expList = new ExprList(partialExp, new EmptyExprList(s), s);
+			while (currentToken.kind == Token.COMMA) {
+				match(Token.COMMA);
+				start(s);
+				partialExp = parseExpr();
+				finish(s);
+				expList = new ExprList(partialExp, expList, s);
+			}
+			finish(s);
+			match(Token.RCURLY);
+			fullExp = new InitExpr(expList, s);
+		} else {
+			fullExp = parseExpr();
+		}
+		return fullExp;
+	}
 	//  ======================== TYPES ==========================
 
 	Type parseType() throws SyntaxError {
