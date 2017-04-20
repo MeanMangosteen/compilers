@@ -311,17 +311,17 @@ public class Parser {
 	Decl parseInitDeclarator(Type varType) throws SyntaxError {
 		Decl var;
 		Expr varExp = new EmptyExpr(dummyPos); 
-		var = parseDeclarator(varType);
+		/* TODO i always won't be global */
+		var = parseDeclarator(varType, "global");
 		if (currentToken.kind == Token.EQ) {
 			acceptOperator();
 			varExp = parseInitialiser();
 		}
-		/* TODO */
 		((GlobalVarDecl) var).E = varExp;
 		return var;
 	}
 	
-	Decl parseDeclarator(Type varType) throws SyntaxError {
+	Decl parseDeclarator(Type varType, String declType) throws SyntaxError {
 		SourcePosition declPos = varType.position;
 		Decl var;
 		Expr arrayIntExp = new EmptyExpr(dummyPos);
@@ -337,8 +337,16 @@ public class Parser {
 			finish(declPos);
 			varType = new ArrayType(varType, arrayIntExp, declPos);
 		}
+		finish(declPos);
 		/* TODO: make local vs global depending on optional arg */
-		var = new GlobalVarDecl(varType, varIdent, new EmptyExpr(dummyPos), dummyPos);
+		if (declType == "global") {
+			var = new GlobalVarDecl(varType, varIdent, new EmptyExpr(dummyPos), declPos);
+		} else if (declType == "parameter") {
+			var = new ParaDecl(varType, varIdent, declPos);
+		} else {
+			var = new LocalVarDecl(varType, varIdent, new EmptyExpr(dummyPos), declPos);
+		}
+
 		return var;
 	}
 	
@@ -375,10 +383,28 @@ public class Parser {
 		SourcePosition typePos = new SourcePosition();
 		start(typePos);
 
-		accept();
+	switch(currentToken.kind) {
+		case Token.VOID:
+			match(Token.VOID);
+			typeAST = new VoidType(dummyPos);
+			break;
+		case Token.BOOLEAN:
+			match(Token.BOOLEAN);
+			typeAST = new BooleanType(dummyPos);
+			break;
+		case Token.INT:
+			match(Token.INT);
+			typeAST = new IntType(dummyPos);
+			break;
+		case Token.FLOAT:
+			match(Token.FLOAT);
+			typeAST = new FloatType(dummyPos);
+			break;
+		default:
+			syntacticError("expecting a type", currentToken.spelling);
+		}
 		finish(typePos);
-		typeAST = new VoidType(typePos);
-
+		typeAST.position = typePos;
 		return typeAST;
 	}
 
@@ -466,20 +492,99 @@ public class Parser {
 	// ======================= PARAMETERS =======================
 
 	List parseParaList() throws SyntaxError {
-		List formalsAST = null;
+		List paraList = new EmptyParaList(dummyPos);
 
 		SourcePosition formalsPos = new SourcePosition();
 		start(formalsPos);
 
 		match(Token.LPAREN);
+		if (currentToken.kind != Token.RPAREN) {
+			paraList = parseProperParaList();
+		}
 		match(Token.RPAREN);
 		finish(formalsPos);
-		formalsAST = new EmptyParaList (formalsPos);
 
-		return formalsAST;
+		return paraList;
 	}
 
+	List parseProperParaList() throws SyntaxError {
+		SourcePosition paraListPos = new SourcePosition();
+		List paraList;
+		Decl para;
+		
+		start(paraListPos);
+		para = parseParaDecl();
+		finish(paraListPos);
+		paraList = new ParaList((ParaDecl) para, new EmptyParaList(dummyPos), paraListPos);
+		
+		if(currentToken.kind == Token.COMMA) {
+			match(Token.COMMA);
+			((ParaList) paraList).PL = parseProperParaList();
+			finish(paraListPos);
+			paraList.position = paraListPos;
+		}
 
+		return paraList;
+	}
+
+	Decl parseParaDecl() throws SyntaxError {
+		SourcePosition paraPos = new SourcePosition();
+		Decl para;
+		Type paraType;
+
+		start(paraPos);
+		paraType = parseType();
+		para = parseDeclarator(paraType, "parameter");
+		finish(paraPos);
+
+		return para;
+	}
+
+	List parseArgList() throws SyntaxError {
+		SourcePosition argListPos = new SourcePosition();
+		List argList = new EmptyArgList(dummyPos);
+		
+		start(argListPos);
+		match(Token.LPAREN);
+		if (currentToken.kind != Token.RPAREN) {
+			argList = parseProperArgList();
+		}
+		match(Token.RPAREN);
+		
+		return argList;
+	}
+
+	List parseProperArgList() throws SyntaxError {
+		SourcePosition argListPos = new SourcePosition();
+		List argList;
+		Arg arg;
+		
+		start(argListPos);
+		arg = parseArg();
+		finish(argListPos);
+		argList = new ArgList(arg, new EmptyArgList(dummyPos), argListPos);
+		if (currentToken.kind == Token.COMMA) {
+			match(Token.COMMA);
+			((ArgList) argList).AL = parseProperArgList();
+			finish(argListPos);
+			argList.position = argListPos;
+		} 
+			
+		return argList;
+	}
+
+	Arg parseArg() throws SyntaxError {
+		SourcePosition argPos = new SourcePosition();
+		Arg arg;
+		
+		start(argPos);
+		Expr argExpr = parseExpr();
+		finish(argPos);
+		
+		arg = new Arg(argExpr, argPos);
+
+		return arg;
+	}
 	// ======================= EXPRESSIONS ======================
 
 
@@ -537,7 +642,9 @@ public class Parser {
 		start(unaryPos);
 
 		switch (currentToken.kind) {
+		case Token.PLUS:
 		case Token.MINUS:
+		case Token.NOT:
 		{
 			Operator opAST = acceptOperator();
 			Expr e2AST = parseUnaryExpr();
@@ -568,26 +675,47 @@ public class Parser {
 			finish(primPos);
 			Var simVAST = new SimpleVar(iAST, primPos);
 			exprAST = new VarExpr(simVAST, primPos);
+			if (currentToken.kind == Token.LBRACKET) {
+				match(Token.LBRACKET);
+				Expr arrayIndexExp = parseExpr();
+				match(Token.RBRACKET);
+				finish(primPos);
+				exprAST = new ArrayExpr(simVAST, arrayIndexExp, primPos);
+			} else if (currentToken.kind == Token.LPAREN) {
+				List argList = parseArgList();
+				finish(primPos);
+				exprAST = new CallExpr(iAST, argList, primPos);
+			}
 			break;
-
 		case Token.LPAREN:
-		{
 			accept();
 			exprAST = parseExpr();
 			match(Token.RPAREN);
-		}
-		break;
-
+			break;
 		case Token.INTLITERAL:
 			IntLiteral ilAST = parseIntLiteral();
 			finish(primPos);
 			exprAST = new IntExpr(ilAST, primPos);
 			break;
-
+		case Token.FLOATLITERAL:
+			FloatLiteral floatLiteral = parseFloatLiteral();
+			finish(primPos);
+			exprAST = new FloatExpr(floatLiteral, primPos);
+			break;
+		case Token.BOOLEANLITERAL:
+			BooleanLiteral boolLiteral = parseBooleanLiteral();
+			finish(primPos);
+			exprAST = new BooleanExpr(boolLiteral, primPos);
+			break;
+		case Token.STRINGLITERAL:
+			StringLiteral stringLiteral = parseStringLiteral();
+			finish(primPos);
+			exprAST = new StringExpr(stringLiteral, primPos);
+			break;
 		default:
 			syntacticError("illegal primary expression", currentToken.spelling);
-
 		}
+
 		return exprAST;
 	}
 
@@ -656,5 +784,18 @@ public class Parser {
 		return BL;
 	}
 
+	StringLiteral parseStringLiteral() throws SyntaxError {
+		StringLiteral strLiteral = null;
+
+		if (currentToken.kind == Token.STRINGLITERAL) {
+			String spelling = currentToken.spelling;
+			accept();
+			strLiteral = new StringLiteral(spelling, previousTokenPosition);
+		} else {
+			syntacticError("string literal expected here", "");
+		}
+		
+		return strLiteral;
+	}
 }
 
