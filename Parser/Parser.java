@@ -590,8 +590,103 @@ public class Parser {
 
 	Expr parseExpr() throws SyntaxError {
 		Expr exprAST = null;
-		exprAST = parseAdditiveExpr();
+		exprAST = parseAssignExpr();
 		return exprAST;
+	}
+	
+	Expr parseAssignExpr() throws SyntaxError {
+		SourcePosition assignExpPos = new SourcePosition();
+		Expr assignExpr;
+		
+		start(assignExpPos);
+		assignExpr = parseCondOrExpr();
+		finish(assignExpPos);
+		if (currentToken.kind == Token.EQ) {
+			acceptOperator();
+			assignExpr = new AssignExpr(assignExpr, parseAssignExpr(), dummyPos);
+			finish(assignExpPos);
+			assignExpr.position = assignExpPos;
+		}
+		
+		return assignExpr;
+	}
+	
+	
+	Expr parseCondOrExpr() throws SyntaxError {
+		SourcePosition condOrExprPos = new SourcePosition();
+		Expr condOrExpr;
+		Operator or;
+		
+		start(condOrExprPos);
+		condOrExpr = parseCondAndExpr();
+		if (currentToken.kind == Token.OROR) {
+			or = acceptOperator();
+			condOrExpr = new BinaryExpr(condOrExpr, or, parseCondAndExpr(), dummyPos);
+			finish(condOrExprPos);
+			condOrExpr.position = condOrExprPos;
+		}
+		
+		return condOrExpr;
+	}
+	
+	
+	Expr parseCondAndExpr() throws SyntaxError {
+		SourcePosition condAndExprPos = new SourcePosition();
+		Expr condAndExpr;
+		Operator and;
+		
+		start(condAndExprPos);
+		condAndExpr = parseEqualityExpr();
+		if (currentToken.kind == Token.ANDAND) {
+			and = acceptOperator();
+			condAndExpr = new BinaryExpr(condAndExpr, and, parseEqualityExpr(), dummyPos);
+			finish(condAndExprPos);
+			condAndExpr.position = condAndExprPos;
+		}
+		
+		return condAndExpr;
+	}
+	
+	
+	Expr parseEqualityExpr() throws SyntaxError {
+		SourcePosition equalityPos = new SourcePosition();
+		Expr equalityExpr;
+		Operator eqeq;
+		
+		start(equalityPos);
+		equalityExpr = parseRelExpr();
+		if (currentToken.kind == Token.EQEQ) {
+			eqeq = acceptOperator();
+			equalityExpr = new BinaryExpr(equalityExpr, eqeq, parseEqualityExpr(), dummyPos);
+			finish(equalityPos);
+			equalityExpr.position = equalityPos;
+		}
+		
+		return equalityExpr;
+	}
+	
+	
+	Expr parseRelExpr() throws SyntaxError {
+		SourcePosition relPos = new SourcePosition();
+		Expr relExpr;
+		Operator angleOp;
+		
+		start(relPos);
+		relExpr = parseAdditiveExpr();
+		switch(currentToken.kind) {
+		case Token.LT:
+		case Token.LTEQ:
+		case Token.GT:
+		case Token.GTEQ:
+			angleOp = acceptOperator();
+			relExpr = new BinaryExpr(relExpr, angleOp, parseRelExpr(), dummyPos);
+			finish(relPos);
+			relExpr.position = relPos;
+		default:
+			break;
+		}
+		
+		return relExpr;
 	}
 
 	Expr parseAdditiveExpr() throws SyntaxError {
