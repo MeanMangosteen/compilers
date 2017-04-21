@@ -209,7 +209,45 @@ public class Parser {
 	}
 	
 	
+	DeclList parseVarDeclList() throws SyntaxError {
+		SourcePosition declListPos = new SourcePosition();
+		DeclList varDeclList;
+		DeclList mostChildishDeclList;
+		List varDecl;
 
+		start(declListPos);
+		varDeclList = ((DeclList) parseVarDecl());
+		mostChildishDeclList = varDeclList;
+		/* go to the child most 'parent' */
+		while (!(mostChildishDeclList.DL instanceof EmptyDeclList)) {
+			mostChildishDeclList = ((DeclList) mostChildishDeclList.DL);
+		}
+		/* if we have more declarations then set that parent's child the tree */
+		if (currentInFirst("var-decl")) {
+			mostChildishDeclList = parseVarDeclList();
+			finish(declListPos);
+			varDeclList.position = declListPos;
+		}
+		
+
+		return varDeclList;
+	}
+	
+	List parseVarDecl() throws SyntaxError {
+		SourcePosition declPos = new SourcePosition();
+		Decl varDecl;
+		Type varType;
+		List declaratorList;
+		
+		varType = parseType();
+		declaratorList = parseInitDeclaratorList(varType);
+		match(Token.SEMICOLON);
+		
+		return declaratorList;
+	}
+	
+
+	/* TODO: should do more than VOID */
 	List parseFuncDeclList() throws SyntaxError {
 		List dlAST = null;
 		Decl dAST = null;
@@ -249,7 +287,7 @@ public class Parser {
 		return fAST;
 	}
 
-	    DeclList parseVarDeclNew(Type t, Ident i, SourcePosition s) throws SyntaxError {
+	DeclList parseVarDeclNew(Type t, Ident i, SourcePosition s) throws SyntaxError {
 	    DeclList declList;
 		GlobalVarDecl var;
 		Type varType = t;
@@ -295,15 +333,16 @@ public class Parser {
 		DeclList declList;
 		Decl var;
 		start(declListPos);
-		if (currentToken.kind != Token.COMMA) {
-			return new EmptyDeclList(dummyPos);
-		}
-		/* get all the other (potential) nodes in ast */
-		finish(declListPos);
-		match(Token.COMMA);
 		var = parseInitDeclarator(varType);
-		declList = new DeclList(var, new EmptyDeclList(dummyPos), declListPos);
-		declList.DL = parseInitDeclaratorList(varType);
+		if (currentToken.kind != Token.COMMA) {
+			finish(declListPos);
+			declList = new DeclList(var, new EmptyDeclList(dummyPos), declListPos);
+		} else {
+			match(Token.COMMA);
+			declList = new DeclList(var, parseInitDeclaratorList(varType), dummyPos);
+			finish(declListPos);
+			declList.position = declListPos;
+		}
 		
 		return declList;
 	}
@@ -411,26 +450,21 @@ public class Parser {
 	// ======================= STATEMENTS ==============================
 
 	Stmt parseCompoundStmt() throws SyntaxError {
-		Stmt cAST = null; 
+		SourcePosition compoundStmtPos = new SourcePosition();
+		Stmt compoundStmt; 
+		List varDeclList;
+		List stmtList;
 
-		SourcePosition stmtPos = new SourcePosition();
-		start(stmtPos);
-
+		start(compoundStmtPos);
 		match(Token.LCURLY);
-
-		// Insert code here to build a DeclList node for variable declarations
-		List slAST = parseStmtList();
+		varDeclList = parseVarDeclList();
+		stmtList = parseStmtList();
 		match(Token.RCURLY);
-		finish(stmtPos);
+		finish(compoundStmtPos);
 
-		/* In the subset of the VC grammar, no variable declarations are
-		 * allowed. Therefore, a block is empty iff it has no statements.
-		 */
-		if (slAST instanceof EmptyStmtList) 
-			cAST = new EmptyCompStmt(stmtPos);
-		else
-			cAST = new CompoundStmt(new EmptyDeclList(dummyPos), slAST, stmtPos);
-		return cAST;
+		compoundStmt = new CompoundStmt(varDeclList, stmtList, compoundStmtPos);
+
+		return compoundStmt;
 	}
 
 
@@ -473,9 +507,7 @@ public class Parser {
 		SourcePosition stmtPos = new SourcePosition();
 		start(stmtPos);
 
-		if (currentToken.kind == Token.ID
-				|| currentToken.kind == Token.INTLITERAL
-				|| currentToken.kind == Token.LPAREN) {
+		if (currentToken.kind != Token.SEMICOLON) {
 			Expr eAST = parseExpr();
 			match(Token.SEMICOLON);
 			finish(stmtPos);
