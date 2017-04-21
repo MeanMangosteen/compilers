@@ -74,7 +74,11 @@ public class Parser {
 	private Token currentToken;
 	private SourcePosition previousTokenPosition;
 	private SourcePosition dummyPos = new SourcePosition();
-
+	
+/*	private Boolean inFunction;
+	 true if lock is available 
+	private Boolean inFunctionLock = true;
+*/
 	public Parser (Scanner lexer, ErrorReporter reporter) {
 		scanner = lexer;
 		errorReporter = reporter;
@@ -215,12 +219,15 @@ public class Parser {
 	}
 	
 	
-	DeclList parseVarDeclList() throws SyntaxError {
+	List parseVarDeclList() throws SyntaxError {
 		SourcePosition declListPos = new SourcePosition();
 		DeclList varDeclList;
 		DeclList mostChildishDeclList;
 		List varDecl;
 
+		if (!(currentInFirst("var-decl"))) {
+			return new EmptyDeclList(dummyPos);
+		}
 		start(declListPos);
 		/* TODO: if this returns EmptyDecList will below while loop be a problem? */
 		/* TOOD: add if to see if mostChildishDeclList.D is empyt */
@@ -248,7 +255,7 @@ public class Parser {
 		List declaratorList;
 		
 		varType = parseType();
-		declaratorList = parseInitDeclaratorList(varType);
+		declaratorList = parseInitDeclaratorList(varType, "local");
 		match(Token.SEMICOLON);
 		
 		return declaratorList;
@@ -327,7 +334,7 @@ public class Parser {
 		if (currentToken.kind == Token.COMMA) {
 			match(Token.COMMA);
 			/* this will return and declList*/
-			commaDeclList = parseInitDeclaratorList(t);
+			commaDeclList = parseInitDeclaratorList(t, "global");
 
 		}
 		match(Token.SEMICOLON);
@@ -336,18 +343,18 @@ public class Parser {
 		return declList;
 	}
 	
-	List parseInitDeclaratorList(Type varType) throws SyntaxError {
+	List parseInitDeclaratorList(Type varType, String declType) throws SyntaxError {
 		SourcePosition declListPos = new SourcePosition();
 		DeclList declList;
 		Decl var;
 		start(declListPos);
-		var = parseInitDeclarator(varType);
+		var = parseInitDeclarator(varType, declType);
 		if (currentToken.kind != Token.COMMA) {
 			finish(declListPos);
 			declList = new DeclList(var, new EmptyDeclList(dummyPos), declListPos);
 		} else {
 			match(Token.COMMA);
-			declList = new DeclList(var, parseInitDeclaratorList(varType), dummyPos);
+			declList = new DeclList(var, parseInitDeclaratorList(varType, declType), dummyPos);
 			finish(declListPos);
 			declList.position = declListPos;
 		}
@@ -355,16 +362,22 @@ public class Parser {
 		return declList;
 	}
 
-	Decl parseInitDeclarator(Type varType) throws SyntaxError {
+	Decl parseInitDeclarator(Type varType, String declType) throws SyntaxError {
 		Decl var;
 		Expr varExp = new EmptyExpr(dummyPos); 
 		/* TODO i always won't be global */
-		var = parseDeclarator(varType, "global");
+		var = parseDeclarator(varType, declType);
 		if (currentToken.kind == Token.EQ) {
 			acceptOperator();
 			varExp = parseInitialiser();
 		}
-		((GlobalVarDecl) var).E = varExp;
+		if (var instanceof GlobalVarDecl) {
+			((GlobalVarDecl) var).E = varExp;
+		} else if (var instanceof LocalVarDecl) {
+			((LocalVarDecl) var).E = varExp;
+		} else {
+			throw new RuntimeException("I only deal with globals and locals mate");
+		}
 		return var;
 	}
 	
@@ -462,16 +475,34 @@ public class Parser {
 		Stmt compoundStmt; 
 		List varDeclList;
 		List stmtList;
-
+		Boolean haveLock = false;
+		
+		/* if lock available, acquire it and set in funciton */
+/*		if (inFunctionLock) {
+			inFunctionLock = false;
+			inFunction = true;
+			haveLock = true;
+		}
+*/
 		start(compoundStmtPos);
 		match(Token.LCURLY);
+		if (currentToken.kind == Token.RCURLY) {
+			match(Token.RCURLY);
+			return new EmptyCompStmt(dummyPos);
+		}
 		varDeclList = parseVarDeclList();
 		stmtList = parseStmtList();
 		match(Token.RCURLY);
 		finish(compoundStmtPos);
 
 		compoundStmt = new CompoundStmt(varDeclList, stmtList, compoundStmtPos);
-
+		
+/*		if (haveLock) {
+			inFunction = false;
+			inFunctionLock = true;
+			haveLock = false;
+		}
+*/
 		return compoundStmt;
 	}
 
@@ -502,12 +533,143 @@ public class Parser {
 	}
 
 	Stmt parseStmt() throws SyntaxError {
-		Stmt sAST = null;
+		Stmt stmt = null;
 
-		sAST = parseExprStmt();
+		if (currentToken.kind == Token.LCURLY) {
+			parseCompoundStmt();
+		} else if (currentToken.kind == Token.IF) {
+			stmt = parseIfStmt();
+		} else if (currentToken.kind == Token.FOR) {
+			stmt = parseForStmt();
+		} else if (currentToken.kind == Token.WHILE) {
+			stmt = parseWhileStmt();
+		} else if (currentToken.kind == Token.CONTINUE) {
+			stmt = parseContinueStmt();
+		} else if (currentToken.kind == Token.BREAK) {
+			stmt = parseBreakStmt();
+		} else if (currentToken.kind == Token.RETURN) {
+			stmt = parseReturnStmt();
+		} else {
+			stmt = parseExprStmt();
+		}
 
-		return sAST;
+		return stmt;
 	}
+	
+	Stmt parseIfStmt() throws SyntaxError {
+		SourcePosition ifPos = new SourcePosition();
+		Stmt ifStmt; 
+		Expr ifExpr;
+		Stmt ifBody;
+		Stmt elseBody;
+
+		start(ifPos);
+		match(Token.IF);
+		match(Token.LPAREN);
+		ifExpr = parseExpr();
+		match(Token.RPAREN);
+		ifBody = parseStmt();
+		if (currentToken.kind == Token.ELSE) {
+			match(Token.ELSE);
+			elseBody = parseStmt();
+			finish(ifPos);
+			ifStmt = new IfStmt(ifExpr, ifBody, elseBody, ifPos);
+		} else {
+			finish(ifPos);
+			ifStmt =  new IfStmt(ifExpr, ifBody, ifPos);
+		}
+		
+		return ifStmt;
+
+	}
+
+	Stmt parseForStmt() throws SyntaxError {
+		SourcePosition forPos = new SourcePosition();
+		Stmt forStmt;
+		Expr e1 = new EmptyExpr(dummyPos);
+		Expr e2 = new EmptyExpr(dummyPos);
+		Expr e3 = new EmptyExpr(dummyPos);
+		Stmt forBody;
+		
+		start(forPos);
+		match(Token.FOR);
+		match(Token.LPAREN);
+		if (currentToken.kind != Token.SEMICOLON) {
+			e1 = parseExpr();
+		}
+		match(Token.SEMICOLON);
+		if (currentToken.kind != Token.SEMICOLON) {
+			e2 = parseExpr();
+		}
+		match(Token.SEMICOLON);
+		if (currentToken.kind != Token.RPAREN) {
+			e3 = parseExpr();
+		}
+		match(Token.RPAREN);
+		forBody = parseStmt(); 
+		finish(forPos);
+
+		forStmt = new ForStmt(e1, e2, e3, forBody, forPos);
+		
+		return forStmt;
+	}
+
+	Stmt parseWhileStmt() throws SyntaxError {
+		SourcePosition whilePos = new SourcePosition();
+		Stmt whileStmt;
+		Expr whileExpr;
+		Stmt whileBody;
+		
+		start(whilePos);
+		match(Token.WHILE);
+		match(Token.LPAREN);
+		whileExpr = parseExpr();
+		match(Token.RPAREN);
+		whileBody = parseStmt();
+		finish(whilePos);
+		
+		whileStmt = new WhileStmt(whileExpr, whileBody, whilePos);
+		
+		return whileStmt;
+	}
+
+	Stmt parseBreakStmt() throws SyntaxError {
+		SourcePosition breakPos = new SourcePosition();
+		
+		start(breakPos);
+		match(Token.BREAK);
+		match(Token.SEMICOLON);
+		finish(breakPos);
+
+		return new BreakStmt(breakPos);
+	}
+
+	Stmt parseContinueStmt() throws SyntaxError {
+		SourcePosition continuePos = new SourcePosition();
+		
+		start(continuePos);
+		match(Token.CONTINUE);
+		match(Token.SEMICOLON);
+		finish(continuePos);
+		
+		return new ContinueStmt(continuePos);
+	}
+
+	Stmt parseReturnStmt() throws SyntaxError {
+		SourcePosition retPos = new SourcePosition();
+		Expr retExpr = new EmptyExpr(dummyPos);
+
+		start(retPos);
+		match(Token.RETURN);
+		if (currentToken.kind != Token.SEMICOLON) {
+			retExpr = parseExpr();
+		}
+		match(Token.SEMICOLON);
+		finish(retPos);
+		
+		return new ReturnStmt(retExpr, retPos);
+	}
+	
 
 	Stmt parseExprStmt() throws SyntaxError {
 		Stmt sAST = null;
@@ -550,31 +712,32 @@ public class Parser {
 	List parseProperParaList() throws SyntaxError {
 		SourcePosition paraListPos = new SourcePosition();
 		List paraList;
-		Decl para;
+		ParaDecl para;
+		
 		
 		start(paraListPos);
 		para = parseParaDecl();
-		finish(paraListPos);
-		paraList = new ParaList((ParaDecl) para, new EmptyParaList(dummyPos), paraListPos);
-		
-		if(currentToken.kind == Token.COMMA) {
+		if (currentToken.kind == Token.COMMA) {
 			match(Token.COMMA);
-			((ParaList) paraList).PL = parseProperParaList();
+			paraList = new ParaList(para, parseProperParaList(), dummyPos);
 			finish(paraListPos);
 			paraList.position = paraListPos;
+		} else {
+			finish(paraListPos);
+			paraList = new ParaList(para, new EmptyParaList(dummyPos), paraListPos);
 		}
 
 		return paraList;
 	}
 
-	Decl parseParaDecl() throws SyntaxError {
+	ParaDecl parseParaDecl() throws SyntaxError {
 		SourcePosition paraPos = new SourcePosition();
-		Decl para;
+		ParaDecl para;
 		Type paraType;
 
 		start(paraPos);
 		paraType = parseType();
-		para = parseDeclarator(paraType, "parameter");
+		para = (ParaDecl) parseDeclarator(paraType, "parameter");
 		finish(paraPos);
 
 		return para;
@@ -601,14 +764,15 @@ public class Parser {
 		
 		start(argListPos);
 		arg = parseArg();
-		finish(argListPos);
-		argList = new ArgList(arg, new EmptyArgList(dummyPos), argListPos);
 		if (currentToken.kind == Token.COMMA) {
 			match(Token.COMMA);
-			((ArgList) argList).AL = parseProperArgList();
+			argList = new ArgList(arg, parseProperArgList(), dummyPos);
 			finish(argListPos);
 			argList.position = argListPos;
-		} 
+		} else {
+			finish(argListPos);
+			argList = new ArgList(arg, new EmptyDeclList(dummyPos), argListPos);
+		}
 			
 		return argList;
 	}
