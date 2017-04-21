@@ -165,18 +165,24 @@ public class Parser {
 		SourcePosition declListPos = new SourcePosition();
 		java.util.List<Decl> declArray = new ArrayList<Decl>();
 		DeclList declChild = null;
-		List declList = new EmptyDeclList(dummyPos);
+		DeclList declList;
+		DeclList mostChildishList;
 		List declListChild;
 		
-		/* parse either global variable or funcion declaration until EOF */
 		if (currentToken.kind == Token.EOF) {
 			return new EmptyDeclList(dummyPos);
-		} else {
-			declChild = parseDecl();
-			declChild.DL = parseDeclList();
+		} 
+		declList = parseDecl();
+		mostChildishList = declList;
+		while(!(mostChildishList.DL instanceof EmptyDeclList)) {
+			mostChildishList = ((DeclList) mostChildishList.DL);
 		}
+		if (currentToken.kind != Token.EOF) {
+			mostChildishList.DL = parseDeclList();
+		} 
+		/* parse either global variable or funcion declaration until EOF */
 
-		return declChild;
+		return declList;
 	}
 	
 	
@@ -216,6 +222,8 @@ public class Parser {
 		List varDecl;
 
 		start(declListPos);
+		/* TODO: if this returns EmptyDecList will below while loop be a problem? */
+		/* TOOD: add if to see if mostChildishDeclList.D is empyt */
 		varDeclList = ((DeclList) parseVarDecl());
 		mostChildishDeclList = varDeclList;
 		/* go to the child most 'parent' */
@@ -224,7 +232,7 @@ public class Parser {
 		}
 		/* if we have more declarations then set that parent's child the tree */
 		if (currentInFirst("var-decl")) {
-			mostChildishDeclList = parseVarDeclList();
+			mostChildishDeclList.DL = parseVarDeclList();
 			finish(declListPos);
 			varDeclList.position = declListPos;
 		}
