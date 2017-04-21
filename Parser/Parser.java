@@ -411,29 +411,44 @@ public class Parser {
 	}
 	
 	Expr parseInitialiser() throws SyntaxError {
+		SourcePosition initPos = new SourcePosition();
+		List expList;
+		List mostChildishList;
 		Expr fullExp, partialExp;
-		SourcePosition s = new SourcePosition();
+		Expr initialiser;
+		Expr initExpr, nextInitExpr;
+
+		start(initPos);
 		if (currentToken.kind == Token.LCURLY) {
-			List expList;
 			match(Token.LCURLY);
-			start(s);
-			partialExp = parseExpr();
-			finish(s);
-			expList = new ExprList(partialExp, new EmptyExprList(s), s);
-			while (currentToken.kind == Token.COMMA) {
-				match(Token.COMMA);
-				start(s);
-				partialExp = parseExpr();
-				finish(s);
-				expList = new ExprList(partialExp, expList, s);
-			}
-			finish(s);
+			expList = parseInitialiserList();
 			match(Token.RCURLY);
-			fullExp = new InitExpr(expList, s);
+			finish(initPos);
+			initialiser = new InitExpr(expList, initPos);
 		} else {
-			fullExp = parseExpr();
+			initialiser = parseExpr();
 		}
-		return fullExp;
+		return initialiser;
+	}
+	
+	List parseInitialiserList() throws SyntaxError {
+		SourcePosition initListPos = new SourcePosition();
+		List initList;
+		Expr initExpr;
+		
+		start(initListPos);
+		initExpr = parseExpr();
+		if (currentToken.kind == Token.COMMA) {
+			match(Token.COMMA);
+			initList = new ExprList(initExpr, parseInitialiserList(), dummyPos);
+			finish(initListPos);
+			initList.position = initListPos;
+		} else {
+			finish(initListPos);
+			initList = new ExprList(initExpr, new EmptyExprList(dummyPos), initListPos);
+		}
+		
+		return initList;
 	}
 	//  ======================== TYPES ==========================
 
@@ -536,7 +551,7 @@ public class Parser {
 		Stmt stmt = null;
 
 		if (currentToken.kind == Token.LCURLY) {
-			parseCompoundStmt();
+			stmt = parseCompoundStmt();
 		} else if (currentToken.kind == Token.IF) {
 			stmt = parseIfStmt();
 		} else if (currentToken.kind == Token.FOR) {
@@ -771,7 +786,7 @@ public class Parser {
 			argList.position = argListPos;
 		} else {
 			finish(argListPos);
-			argList = new ArgList(arg, new EmptyDeclList(dummyPos), argListPos);
+			argList = new ArgList(arg, new EmptyArgList(dummyPos), argListPos);
 		}
 			
 		return argList;
