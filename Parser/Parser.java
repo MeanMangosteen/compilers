@@ -162,16 +162,10 @@ public class Parser {
 
 	// ========================== DECLARATIONS ========================
 
-	/* TODO: this will have to handle array from parse decl
-	 * 		 helper function to create AST if array > 1
-	 */
 	List parseDeclList() throws SyntaxError {
 		SourcePosition declListPos = new SourcePosition();
-		java.util.List<Decl> declArray = new ArrayList<Decl>();
-		DeclList declChild = null;
 		DeclList declList;
 		DeclList mostChildishList;
-		List declListChild;
 		
 		if (currentToken.kind == Token.EOF) {
 			return new EmptyDeclList(dummyPos);
@@ -189,16 +183,14 @@ public class Parser {
 		return declList;
 	}
 	
-	
 
-	/* TODO: this will also have to return an array */
 	DeclList parseDecl() throws SyntaxError {
 		SourcePosition declPos = new SourcePosition();
 		start(declPos);
 		Type t = parseType();
 		Ident i = parseIdent();
-		Decl dec;
 		DeclList declList;
+		
 		if (currentToken.kind == Token.LPAREN) {
 			declList = parseFuncDeclNew(t, i, declPos);
 		} else {
@@ -223,14 +215,11 @@ public class Parser {
 		SourcePosition declListPos = new SourcePosition();
 		DeclList varDeclList;
 		DeclList mostChildishDeclList;
-		List varDecl;
 
 		if (!(currentInFirst("var-decl"))) {
 			return new EmptyDeclList(dummyPos);
 		}
 		start(declListPos);
-		/* TODO: if this returns EmptyDecList will below while loop be a problem? */
-		/* TOOD: add if to see if mostChildishDeclList.D is empyt */
 		varDeclList = ((DeclList) parseVarDecl());
 		mostChildishDeclList = varDeclList;
 		/* go to the child most 'parent' */
@@ -249,8 +238,6 @@ public class Parser {
 	}
 	
 	List parseVarDecl() throws SyntaxError {
-		SourcePosition declPos = new SourcePosition();
-		Decl varDecl;
 		Type varType;
 		List declaratorList;
 		
@@ -262,7 +249,6 @@ public class Parser {
 	}
 	
 
-	/* TODO: should do more than VOID */
 	List parseFuncDeclList() throws SyntaxError {
 		List dlAST = null;
 		Decl dAST = null;
@@ -365,7 +351,7 @@ public class Parser {
 	Decl parseInitDeclarator(Type varType, String declType) throws SyntaxError {
 		Decl var;
 		Expr varExp = new EmptyExpr(dummyPos); 
-		/* TODO i always won't be global */
+
 		var = parseDeclarator(varType, declType);
 		if (currentToken.kind == Token.EQ) {
 			acceptOperator();
@@ -398,7 +384,7 @@ public class Parser {
 			varType = new ArrayType(varType, arrayIntExp, declPos);
 		}
 		finish(declPos);
-		/* TODO: make local vs global depending on optional arg */
+
 		if (declType == "global") {
 			var = new GlobalVarDecl(varType, varIdent, new EmptyExpr(dummyPos), declPos);
 		} else if (declType == "parameter") {
@@ -413,10 +399,7 @@ public class Parser {
 	Expr parseInitialiser() throws SyntaxError {
 		SourcePosition initPos = new SourcePosition();
 		List expList;
-		List mostChildishList;
-		Expr fullExp, partialExp;
 		Expr initialiser;
-		Expr initExpr, nextInitExpr;
 
 		start(initPos);
 		if (currentToken.kind == Token.LCURLY) {
@@ -490,7 +473,6 @@ public class Parser {
 		Stmt compoundStmt; 
 		List varDeclList;
 		List stmtList;
-		Boolean haveLock = false;
 		
 		/* if lock available, acquire it and set in funciton */
 /*		if (inFunctionLock) {

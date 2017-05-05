@@ -107,8 +107,6 @@ public class Recogniser {
 
 		try {
 			while (currentToken.kind != Token.EOF) {
-				parseType();
-				parseIdent();
 				parseDecl();
 			}
 			if (currentToken.kind != Token.EOF) {
@@ -121,6 +119,8 @@ public class Recogniser {
 	// ========================== DECLARATIONS ========================
 
 	void parseDecl() throws SyntaxError {
+		parseType();
+		parseIdent();
 		if (currentToken.kind == Token.LPAREN) {
 			parseFuncDeclNew();
 		} else {
