@@ -184,6 +184,9 @@ public final class Checker implements Visitor {
 
 	public Object visitVarExpr(VarExpr ast, Object o) {
 		ast.type = (Type) ast.V.visit(this, null);
+		if (ast.type == null) {
+			ast.type = StdEnvironment.errorType;
+		}
 		return ast.type;
 	}
 
@@ -647,9 +650,21 @@ public final class Checker implements Visitor {
 
 	@Override
 	public Object visitArrayExpr(ArrayExpr ast, Object o) {
-		ast.V.visit(this, null);
+		/* this visits SimpleVar */
+		ast.type = (Type) ast.V.visit(this, null);
+		SimpleVar arrVar = (SimpleVar) ast.V;
+		if (arrVar == null) { 
+			ast.type = StdEnvironment.errorType;
+		} else {
+			Type arrVarDeclType = (Type) ((Decl) arrVar.I.decl).T;
+			if (arrVar.I.decl instanceof FuncDecl || !arrVarDeclType.isArrayType()) {
+				reporter.reportError(errMesg[12] + ": %", arrVar.I.spelling, arrVar.I.position);
+				ast.type = StdEnvironment.errorType;
+			}
+		}
+		/* get the expr inside square brackets, i.e arr[expr] */
 		ast.E.visit(this, null);
-		return null;
+		return ast.type;
 	}
 
 	@Override
