@@ -233,6 +233,9 @@ public final class Checker implements Visitor {
 		
 		/* visit expression with current as so initExpr can see decl type*/
 		varExp.visit(this, ast);
+		if (ast.T.isArrayType() && !(varExp instanceof InitExpr)) {
+				reporter.reportError(errMesg[15] + ": %", ast.I.spelling, ast.position);
+		}
 
 		/* variables can not be of type void, or arrays of type void */
 		if (ast.T.isVoidType()) {
@@ -604,7 +607,8 @@ public final class Checker implements Visitor {
 		ArrayType arrType = (ArrayType) varDecl.T;
 
 		/* get the original size */
-		Expr origSize = arrType.E;
+		/* can only be an IntExpr as per VC grammar */
+		IntExpr origSize = (IntExpr) arrType.E;
 		/* set size to 0 for counting in recursion */
 		arrType.E = new IntExpr(new IntLiteral("0", dummyPos), dummyPos);
 		/* this will go to ExprList */
@@ -614,6 +618,15 @@ public final class Checker implements Visitor {
 		 * otherwise do nothing, size has been set in recursion
 		 */
 		if (!origSize.isEmptyExpr()) {
+			IntExpr calcSize = (IntExpr) arrType.E;
+			/* if there was a specified size the check 
+			 * if it is large enough by comparing it 
+			 * to the calculated size determined through recursion
+			 */
+			if(isArraySmall(origSize, calcSize)) {
+				reporter.reportError(errMesg[16] + ": %", varDecl.I.spelling, ast.position);
+			}
+			/* set is back to original size */
 			arrType.E = origSize;
 		}
 		
@@ -630,6 +643,26 @@ public final class Checker implements Visitor {
 		Integer currSize = Integer.parseInt(size.IL.spelling);
 		currSize++;
 		size.IL.spelling = Integer.toString(currSize);
+	}
+	
+	/* takes in the original size and the calculated size
+	 * from recursion and determines whether is original
+	 * size is greater or equal to calc size
+	 */
+	boolean isArraySmall(IntExpr origSize, IntExpr calcSize) {
+		Integer origSizeInt;
+		Integer calcSizeInt;
+		
+		origSizeInt = Integer.parseInt(origSize.IL.spelling);
+		calcSizeInt = Integer.parseInt(calcSize.IL.spelling);
+		
+		if (origSizeInt >= calcSizeInt) {
+			/* array is not too small return false */
+			return false;
+		} else {
+			/* array is too small return true */
+			return true;
+		}
 	}
 
 	@Override
