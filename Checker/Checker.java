@@ -595,9 +595,10 @@ public final class Checker implements Visitor {
 	public Object visitInitExpr(InitExpr ast, Object o) {
 		Decl varDecl = (Decl) o;
 		
-		/* Only arrays are expected ? */
+		/* Only arrays deal with arrays */
 		if (!varDecl.T.isArrayType()) {
-			throw new java.lang.RuntimeException("Excepting array type");
+				reporter.reportError(errMesg[14] + ": %", varDecl.I.spelling, ast.position);
+				return StdEnvironment.errorType;
 		}
 
 		ArrayType arrType = (ArrayType) varDecl.T;
@@ -607,7 +608,7 @@ public final class Checker implements Visitor {
 		/* set size to 0 for counting in recursion */
 		arrType.E = new IntExpr(new IntLiteral("0", dummyPos), dummyPos);
 		/* this will go to ExprList */
-		ast.IL.visit(this, arrType);
+		ast.type = (Type) ast.IL.visit(this, arrType);
 		
 		/* if there was initially an original size, set it back
 		 * otherwise do nothing, size has been set in recursion
@@ -622,7 +623,7 @@ public final class Checker implements Visitor {
 		 * if we do it in this function then we don't access
 		 * to the positions.
 		 */
-		return null;
+		return ast.type;
 	}
 	
 	void incrementArraySize(IntExpr size) {
