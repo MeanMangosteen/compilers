@@ -233,8 +233,19 @@ public final class Checker implements Visitor {
 		
 		/* visit expression with current as so initExpr can see decl type*/
 		varExp.visit(this, ast);
-		if (ast.T.isArrayType() && !(varExp instanceof InitExpr || varExp instanceof EmptyExpr)) {
-				reporter.reportError(errMesg[15] + ": %", ast.I.spelling, ast.position);
+		
+		/* error checking if variable is of type array */
+		if (ast.T.isArrayType() ) {
+			ArrayType arrType = (ArrayType) ast.T;
+				/* array decls have to have { } or no initialiser */
+				if (!(varExp instanceof InitExpr || varExp instanceof EmptyExpr)) {
+					reporter.reportError(errMesg[15] + ": %", ast.I.spelling, ast.position);
+				} else if (varExp instanceof EmptyExpr) {
+					/* if there is no { } initialiser, then there has to be a size specified */
+					if (arrType.E.isEmptyExpr()) {
+						reporter.reportError(errMesg[18] + ": %", ast.I.spelling, ast.I.position);
+					}
+				}
 		}
 
 		/* variables can not be of type void, or arrays of type void */
