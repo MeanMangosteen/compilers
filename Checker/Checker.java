@@ -481,31 +481,73 @@ public final class Checker implements Visitor {
 
 	@Override
 	public Object visitIfStmt(IfStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Type ifExprType = (Type) ast.E.visit(this, null);
+		if (!ifExprType.isBooleanType()) {
+				reporter.reportError(errMesg[20] + ": ", null, ast.E.position);
+		}
+
+		if (ast.S1 instanceof BreakStmt || ast.S1 instanceof ContinueStmt) {
+			ast.S1.visit(this, ast);
+		} else {
+			ast.S1.visit(this, o);
+		}
+
+		if (ast.S2 instanceof BreakStmt || ast.S2 instanceof ContinueStmt) {
+			ast.S2.visit(this, ast);
+		} else {
+			ast.S2.visit(this, o);
+		}
+
 		return null;
 	}
 
 	@Override
 	public Object visitWhileStmt(WhileStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Type ifExprType = (Type) ast.E.type.visit(this, null);
+		if (!ifExprType.isBooleanType()) {
+				reporter.reportError(errMesg[20] + ": ", null, ast.E.position);
+		}
+
+		if (ast.S instanceof BreakStmt || ast.S instanceof ContinueStmt) {
+			ast.S.visit(this, ast);
+		} else {
+			ast.S.visit(this, o);
+		}
+
 		return null;
 	}
 
 	@Override
 	public Object visitForStmt(ForStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Type ifExprType = (Type) ast.E2.type.visit(this, null);
+		if (!ifExprType.isBooleanType()) {
+				reporter.reportError(errMesg[20] + ": ", null, ast.E2.position);
+		}
+		
+		if (ast.S instanceof BreakStmt || ast.S instanceof ContinueStmt) {
+			ast.S.visit(this, ast);
+		} else {
+			ast.S.visit(this, o);
+		}
+		
 		return null;
 	}
 
 	@Override
 	public Object visitBreakStmt(BreakStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		if (!(o instanceof WhileStmt || o instanceof ForStmt)) {
+			/* TODO: throw error */
+		}
+
 		return null;
 	}
 
 	@Override
 	public Object visitContinueStmt(ContinueStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		if (!(o instanceof WhileStmt || o instanceof ForStmt)) {
+			/* TODO: throw error */
+		}
+
 		return null;
 	}
 
