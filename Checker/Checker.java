@@ -617,9 +617,9 @@ public final class Checker implements Visitor {
 
 		ArrayType arrType = (ArrayType) varDecl.T;
 
-		/* get the original size */
-		/* can only be an IntExpr as per VC grammar */
-		IntExpr origSize = (IntExpr) arrType.E;
+		/* get the original size, this can be EmptyExpr */
+		Expr origSize =  arrType.E;
+
 		/* set size to 0 for counting in recursion */
 		arrType.E = new IntExpr(new IntLiteral("0", dummyPos), dummyPos);
 		/* this will go to ExprList */
@@ -634,7 +634,7 @@ public final class Checker implements Visitor {
 			 * if it is large enough by comparing it 
 			 * to the calculated size determined through recursion
 			 */
-			if(isArraySmall(origSize, calcSize)) {
+			if(isArraySmall((IntExpr) origSize, calcSize)) {
 				reporter.reportError(errMesg[16] + ": %", varDecl.I.spelling, ast.position);
 			}
 			/* set is back to original size */
@@ -717,7 +717,15 @@ public final class Checker implements Visitor {
 
 	@Override
 	public Object visitCallExpr(CallExpr ast, Object o) {
-		FuncDecl fd = (FuncDecl) ast.I.visit(this, null);
+		FuncDecl fd = (FuncDecl) o;
+		Ident callIdent = ast.I;
+		Decl callIdentDecl = (Decl) ast.I.visit(this, null);
+		
+		if (!callIdentDecl.isFuncDecl()) {
+				reporter.reportError(errMesg[19] + ": %", callIdent.spelling, callIdent.position);
+				/* no point of visiting arguments if not a function */
+				return null;
+		}
 		ast.AL.visit(this, null);
 		/* TODO: make helper funciton to check arg types */
 		
