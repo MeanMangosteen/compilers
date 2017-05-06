@@ -233,7 +233,7 @@ public final class Checker implements Visitor {
 		
 		/* visit expression with current as so initExpr can see decl type*/
 		varExp.visit(this, ast);
-		if (ast.T.isArrayType() && !(varExp instanceof InitExpr)) {
+		if (ast.T.isArrayType() && !(varExp instanceof InitExpr || varExp instanceof EmptyExpr)) {
 				reporter.reportError(errMesg[15] + ": %", ast.I.spelling, ast.position);
 		}
 
@@ -684,6 +684,9 @@ public final class Checker implements Visitor {
 
 	@Override
 	public Object visitArrayExpr(ArrayExpr ast, Object o) {
+		if (!(ast.E instanceof IntExpr)) {
+				reporter.reportError(errMesg[17] + ": ", null, ast.E.position);
+		}
 		/* this visits SimpleVar */
 		ast.type = (Type) ast.V.visit(this, null);
 		SimpleVar arrVar = (SimpleVar) ast.V;
@@ -722,25 +725,35 @@ public final class Checker implements Visitor {
 		checkScalar(ast.E2);
 
 		/* making sure first expr is an identifier */
-		if (ast.E1 instanceof VarExpr) {
-			varIdent = ((SimpleVar)((VarExpr)ast.E1).V).I;
-		} else {
+		if (!(ast.E1 instanceof VarExpr || ast.E1 instanceof ArrayExpr)) {
 			reporter.reportError(errMesg[7] + ": ", null,  ast.position);
+			ast.type = StdEnvironment.errorType;
+			return StdEnvironment.errorType;
 		}
 
+		Type t1;
+		if (ast.E1 instanceof VarExpr) {
+			t1 = ((VarExpr) ast.E1).type;
+		} else {
+			/* must be ArrayExpr */
+			//t1 = (((SimpleVar) (((ArrayExpr) ast.E1).V)).I.decl;
+			t1 = ((ArrayType) ((ArrayExpr) ast.E1).type).T;
+		}
 		/* making sure ident and expr to assing are of same type */
-		if (ast.E1.type.assignable(ast.E2.type)) { 
+		if (t1.assignable(ast.E2.type)) { 
 			ast.type = ast.E1.type;
 		} else {
-			if (varIdent != null) {
-				reporter.reportError(errMesg[6] + ": %", varIdent.spelling,  ast.position);
-			}
+			/* TODO: make helper function to get ident,
+			 * so we have spelling for this Error
+			 */
+			reporter.reportError(errMesg[6] + ": ", null,  ast.position);
 			ast.type = StdEnvironment.errorType;
 		}
 		
 		/* we always return types for expr visit methods */
 		return ast.type;
 	}
+	
 
 	@Override
 	public Object visitArgList(ArgList ast, Object o) {
