@@ -120,21 +120,32 @@ public final class Checker implements Visitor {
 	// Statements
 
 	public Object visitCompoundStmt(CompoundStmt ast, Object o) {
+		Object retPresent;
 		idTable.openScope();
 
 		ast.DL.visit(this, o);
-		ast.SL.visit(this, o);
+		retPresent = ast.SL.visit(this, o);
 
 		idTable.closeScope();
-		return null;
+		return retPresent;
 	}
 
 	public Object visitStmtList(StmtList ast, Object o) {
+		Object retPresent = false;
 		ast.S.visit(this, o);
-		if (ast.S instanceof ReturnStmt && ast.SL instanceof StmtList)
-			reporter.reportError(errMesg[30], "", ast.SL.position);
-		ast.SL.visit(this, o);
-		return null;
+		if (ast.S instanceof ReturnStmt) {
+			retPresent = true;
+			if (ast.SL instanceof StmtList) {
+				reporter.reportError(errMesg[30], "", ast.SL.position);
+			} 
+		}
+		
+		if (!((Boolean) retPresent)) {
+			retPresent = ast.SL.visit(this, o);
+		} else {
+			ast.SL.visit(this, o);
+		}
+		return retPresent;
 	}
 
 
@@ -148,7 +159,7 @@ public final class Checker implements Visitor {
 	}
 
 	public Object visitEmptyStmtList(EmptyStmtList ast, Object o) {
-		return null;
+		return false;
 	}
 
 	// Expressions
@@ -204,8 +215,14 @@ public final class Checker implements Visitor {
 		// Pass ast as the 2nd argument (as done below) so that the
 		// formal parameters of the function an be extracted from ast when the
 		// function body is later visited
+		Object retPresent;
+		retPresent = ast.S.visit(this, ast);
+		if (retPresent instanceof Boolean) {
+			if (!ast.T.isVoidType() && !((Boolean) retPresent).booleanValue()) {
+					reporter.reportError(errMesg[31] + "", null, ast.position);
+			}
+		}
 
-		ast.S.visit(this, ast);
 		return null;
 	}
 
@@ -563,14 +580,13 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 			reporter.reportError(errMesg[8] + ": ", null, ast.position);
 		}
 		
-		/* TODO: do we need to return anything? */
 		return null;
 	}
 
 	@Override
 	public Object visitEmptyCompStmt(EmptyCompStmt ast, Object o) {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 
 	@Override
