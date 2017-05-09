@@ -764,10 +764,47 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 				/* no point of visiting arguments if not a function */
 				return null;
 		}
+		
+		/* get number of parameters in declaration */
+		Integer paraCount = getParaCount(ast.I);
+		Integer argCount = getArgCount(ast.AL);
+		
+		if (argCount > paraCount) {
+				reporter.reportError(errMesg[25] + ": ", null, ast.position);
+		} else if (argCount < paraCount) {
+				reporter.reportError(errMesg[26] + ": ", null, ast.position);
+		}
+
+		
 		ast.AL.visit(this, null);
 		/* TODO: make helper funciton to check arg types */
 		
 		return null;
+	}
+	
+	Integer getArgCount(List argList) {
+		List temp = argList;
+		Integer count = 0;
+		
+		while (!temp.isEmptyArgList()) {
+			count++;
+			temp = ((ArgList) temp).AL;
+		}
+		
+		return count;
+	}
+	
+	Integer getParaCount(Ident i) {
+		FuncDecl fd = (FuncDecl) i.decl;
+		List paramList= fd.PL;
+		Integer count = 0;
+		
+		while (!paramList.isEmptyParaList()) {
+			count++;
+			paramList = ((ParaList) paramList).PL;
+		}
+		
+		return count;
 	}
 
 	@Override
@@ -821,15 +858,11 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 
 	@Override
 	public Object visitArg(Arg ast, Object o) {
-		Type t = (Type) ast.type.visit(this, null);
-		if (t != null) {
-			/* TODO: this seems dodge */
-			ast.type = t;
-		} else {
+		ast.type = (Type) ast.E.visit(this, o);
+		if (ast.type == null) {
 			ast.type = StdEnvironment.errorType;
 		}
-
-		return null;
+		return ast.type;
 	}
 
 	@Override
