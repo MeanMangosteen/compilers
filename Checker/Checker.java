@@ -5,10 +5,68 @@
 
 package VC.Checker;
 
-import VC.ASTs.*;
-import VC.Scanner.SourcePosition;
 import VC.ErrorReporter;
 import VC.StdEnvironment;
+import VC.ASTs.AST;
+import VC.ASTs.Arg;
+import VC.ASTs.ArgList;
+import VC.ASTs.ArrayExpr;
+import VC.ASTs.ArrayType;
+import VC.ASTs.AssignExpr;
+import VC.ASTs.BinaryExpr;
+import VC.ASTs.BooleanExpr;
+import VC.ASTs.BooleanLiteral;
+import VC.ASTs.BooleanType;
+import VC.ASTs.BreakStmt;
+import VC.ASTs.CallExpr;
+import VC.ASTs.CompoundStmt;
+import VC.ASTs.ContinueStmt;
+import VC.ASTs.Decl;
+import VC.ASTs.DeclList;
+import VC.ASTs.EmptyArgList;
+import VC.ASTs.EmptyCompStmt;
+import VC.ASTs.EmptyDeclList;
+import VC.ASTs.EmptyExpr;
+import VC.ASTs.EmptyExprList;
+import VC.ASTs.EmptyParaList;
+import VC.ASTs.EmptyStmt;
+import VC.ASTs.EmptyStmtList;
+import VC.ASTs.ErrorType;
+import VC.ASTs.Expr;
+import VC.ASTs.ExprList;
+import VC.ASTs.ExprStmt;
+import VC.ASTs.FloatExpr;
+import VC.ASTs.FloatLiteral;
+import VC.ASTs.FloatType;
+import VC.ASTs.ForStmt;
+import VC.ASTs.FuncDecl;
+import VC.ASTs.GlobalVarDecl;
+import VC.ASTs.Ident;
+import VC.ASTs.IfStmt;
+import VC.ASTs.InitExpr;
+import VC.ASTs.IntExpr;
+import VC.ASTs.IntLiteral;
+import VC.ASTs.IntType;
+import VC.ASTs.List;
+import VC.ASTs.LocalVarDecl;
+import VC.ASTs.Operator;
+import VC.ASTs.ParaDecl;
+import VC.ASTs.ParaList;
+import VC.ASTs.Program;
+import VC.ASTs.ReturnStmt;
+import VC.ASTs.SimpleVar;
+import VC.ASTs.StmtList;
+import VC.ASTs.StringExpr;
+import VC.ASTs.StringLiteral;
+import VC.ASTs.StringType;
+import VC.ASTs.Type;
+import VC.ASTs.UnaryExpr;
+import VC.ASTs.Var;
+import VC.ASTs.VarExpr;
+import VC.ASTs.Visitor;
+import VC.ASTs.VoidType;
+import VC.ASTs.WhileStmt;
+import VC.Scanner.SourcePosition;
 
 public final class Checker implements Visitor {
 
@@ -206,9 +264,11 @@ public final class Checker implements Visitor {
 	// Always returns null. Does not use the given object.
 
 	public Object visitFuncDecl(FuncDecl ast, Object o) {
-		idTable.insert (ast.I.spelling, ast); 
+		declareVariable(ast.I, ast);
+		//idTable.insert (ast.I.spelling, ast); 
 
 		// Your code goes here
+		ast.I.visit(this, null);
 
 		ast.PL.visit(this, ast);
 		// HINT
@@ -239,6 +299,7 @@ public final class Checker implements Visitor {
 	public void checkVarTypes(Decl ast) {
 		/* casting depending on varible type */
 		Expr varExp;
+		Ident varIdent = ast.I;
 		if(ast instanceof GlobalVarDecl) {
 			varExp = ((GlobalVarDecl) ast).E;
 		} else if (ast instanceof LocalVarDecl) {
@@ -248,6 +309,7 @@ public final class Checker implements Visitor {
 					+ "when checking variable types");
 		}
 		
+		varIdent.visit(this, null);
 		/* visit expression with current as so initExpr can see decl type*/
 		varExp.visit(this, ast);
 		
@@ -283,7 +345,6 @@ public final class Checker implements Visitor {
 
 	public Object visitGlobalVarDecl(GlobalVarDecl ast, Object o) {
 		declareVariable(ast.I, ast);
-		
 		checkVarTypes(ast);
 		
 		return null;
@@ -576,7 +637,15 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 			if (!fd.T.isVoidType()) {
 				reporter.reportError(errMesg[8] + ": ", null, ast.position);
 			}
-		} else if (!fd.T.assignable(retType)) {
+		} 
+		
+		/* perform type coercion if need to */
+		if (fd.T.isFloatType() && retType.isIntType()) {
+			ast.E = coerceInt(ast.E);
+		}
+		
+		/* make sure two types are assignable */
+		if (!fd.T.assignable(retType)) {
 			reporter.reportError(errMesg[8] + ": ", null, ast.position);
 		}
 		
@@ -604,9 +673,13 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		switch(ast.O.spelling) {
 		case("+"):
 		case("-"):
-		case("!"):
 			if (!(ast.E.type instanceof IntType || 
 					ast.E.type instanceof FloatType)) {
+				reporter.reportError(errMesg[10] + ": %", ast.O.spelling, ast.position);
+			}
+			break;
+		case("!"):
+			if (!(ast.E.type instanceof BooleanType)) {
 				reporter.reportError(errMesg[10] + ": %", ast.O.spelling, ast.position);
 			}
 			break;
@@ -625,7 +698,14 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		
 		checkScalar(ast.E1);
 		checkScalar(ast.E2);
-		
+
+		/* perform type coercion if need to */
+		if (t1.isFloatType() && t2.isIntType()) {
+			ast.E2 = coerceInt(ast.E2);
+		} else if (t2.isFloatType() && t1.isIntType()) {
+			ast.E1 = coerceInt(ast.E1);
+		}
+		/* make sure two types are assignable */
 		if (t1.assignable(t2)) {
 			ast.type = t1;
 		} else {
@@ -648,7 +728,10 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		if (ast instanceof VarExpr) {
 			var = ((VarExpr) ast).V;
 			i = ((SimpleVar) var).I;
-			decl = (Decl) visitIdent(i, null);
+			decl = idTable.retrieve(i.spelling);
+			if (decl == null) {
+				return;
+			}
 			type = decl.T;
 			if (decl instanceof FuncDecl ||
 					type instanceof ArrayType) {
@@ -775,10 +858,13 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		Ident callIdent = ast.I;
 		Decl callIdentDecl = (Decl) ast.I.visit(this, null);
 		
+		if (callIdentDecl == null)
+			return StdEnvironment.errorType;
+		
 		if (!callIdentDecl.isFuncDecl()) {
 				reporter.reportError(errMesg[19] + ": %", callIdent.spelling, callIdent.position);
 				/* no point of visiting arguments if not a function */
-				return null;
+				return StdEnvironment.errorType;
 		}
 		
 		/* get number of parameters in declaration */
@@ -786,7 +872,7 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		Integer argCount = getArgCount(ast.AL);
 		
 		if (argCount > paraCount) {
-				reporter.reportError(errMesg[25] + ": ", null, ast.position);
+			reporter.reportError(errMesg[25] + ": ", null, ast.position);
 		} else if (argCount < paraCount) {
 				reporter.reportError(errMesg[26] + ": ", null, ast.position);
 		}
@@ -795,7 +881,7 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		ast.AL.visit(this, null);
 		checkArgTypes(ast.AL, ast.I);
 		
-		return null;
+		return fd.T;
 	}
 	
 	void checkArgTypes(List argList, Ident funcDeclIdent) {
@@ -806,8 +892,12 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 			Arg arg = ((ArgList) al).A;
 			ParaDecl param = ((ParaList) pl).P; 
 			if (!arg.type.equals(param.T)) {
-				reporter.reportError(errMesg[27] + ": %", param.I.spelling, argList.position);
-			}
+				if (arg.type.isIntType() && param.T.isFloatType()) {
+					arg.E = coerceInt(arg.E);
+				} else {
+					reporter.reportError(errMesg[27] + ": %", param.I.spelling, argList.position);
+				}
+			} 
 			
 			al = ((ArgList) al).AL;
 			pl = ((ParaList) pl).PL;
@@ -840,10 +930,15 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		return count;
 	}
 
+	private Expr coerceInt(Expr e) {
+		Operator op = new Operator("i2f", dummyPos);
+		UnaryExpr newNode = new UnaryExpr(op, e, dummyPos);
+		newNode.type = StdEnvironment.floatType;
+		return newNode;
+	}
+
 	@Override
 	public Object visitAssignExpr(AssignExpr ast, Object o) {
-		/* TODO: check if E1 will always be an ident, and print error accoridngly */
-		Ident varIdent = null;
 		ast.E1.visit(this, o);
 		ast.E2.visit(this, o);
 		
@@ -856,23 +951,28 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 			reporter.reportError(errMesg[7] + ": ", null,  ast.position);
 			ast.type = StdEnvironment.errorType;
 			return StdEnvironment.errorType;
+		} else if (!actuallyVar(ast.E1)) {
+			reporter.reportError(errMesg[7] + ": ", null,  ast.position);
 		}
 
+		/* formatting Type for assignment check */
 		Type t1;
 		if (ast.E1 instanceof VarExpr) {
 			t1 = ((VarExpr) ast.E1).type;
 		} else {
 			/* must be ArrayExpr */
-			//t1 = (((SimpleVar) (((ArrayExpr) ast.E1).V)).I.decl;
 			t1 = ((ArrayType) ((ArrayExpr) ast.E1).type).T;
 		}
+
+		/* perform type coercion is need to */
+		if (ast.E1.type.isFloatType() && ast.E2.type.isIntType()) {
+			ast.E2 = coerceInt(ast.E2);
+		}
+
 		/* making sure ident and expr to assing are of same type */
 		if (t1.assignable(ast.E2.type)) { 
 			ast.type = ast.E1.type;
 		} else {
-			/* TODO: make helper function to get ident,
-			 * so we have spelling for this Error
-			 */
 			reporter.reportError(errMesg[6] + ": ", null,  ast.position);
 			ast.type = StdEnvironment.errorType;
 		}
@@ -881,6 +981,28 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		return ast.type;
 	}
 	
+	private Boolean actuallyVar(Expr e) {
+		SimpleVar var;
+		if (e instanceof VarExpr) {
+			VarExpr temp = (VarExpr) e;
+			var = (SimpleVar) temp.V;
+		} else {
+			ArrayExpr temp = (ArrayExpr) e;
+			var = (SimpleVar) temp.V;
+		}
+
+		Ident varIdent = var.I;
+		Decl varDecl = (Decl) idTable.retrieve(varIdent.spelling);
+
+		if (varDecl == null) {
+			return false;
+		}
+		
+		if (!(varDecl.isLocalVarDecl() || varDecl.isGlobalVarDecl() || varDecl.isParaDecl())) {
+			return false;
+		}
+		return true;
+	}
 
 	@Override
 	public Object visitArgList(ArgList ast, Object o) {
@@ -909,7 +1031,7 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 	public Object visitSimpleVar(SimpleVar ast, Object o) {
 		Decl binding = (Decl) visitIdent(ast.I, o);
 		if (binding == null) {
-			return null;
+			return StdEnvironment.errorType;
 		} 
 		ast.type = binding.T;
 		return ast.type;
