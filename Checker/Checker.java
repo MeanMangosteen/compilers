@@ -774,12 +774,29 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		} else if (argCount < paraCount) {
 				reporter.reportError(errMesg[26] + ": ", null, ast.position);
 		}
-
 		
+		/* populates the types for args in list */
 		ast.AL.visit(this, null);
-		/* TODO: make helper funciton to check arg types */
+		checkArgTypes(ast.AL, ast.I);
 		
 		return null;
+	}
+	
+	void checkArgTypes(List argList, Ident funcDeclIdent) {
+		FuncDecl fd = (FuncDecl) funcDeclIdent.decl;
+		List pl = fd.PL;
+		List al = argList;
+		while(!al.isEmptyArgList() && !pl.isEmptyParaList()) {
+			Arg arg = ((ArgList) al).A;
+			ParaDecl param = ((ParaList) pl).P; 
+			if (!arg.type.equals(param.T)) {
+				reporter.reportError(errMesg[27] + ": %", param.I.spelling, argList.position);
+			}
+			
+			al = ((ArgList) al).AL;
+			pl = ((ParaList) pl).PL;
+		}
+		
 	}
 	
 	Integer getArgCount(List argList) {
