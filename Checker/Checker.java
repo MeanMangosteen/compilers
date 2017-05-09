@@ -486,68 +486,64 @@ public final class Checker implements Visitor {
 				reporter.reportError(errMesg[20] + ": ", null, ast.E.position);
 		}
 
-		if (ast.S1 instanceof BreakStmt || ast.S1 instanceof ContinueStmt) {
-			ast.S1.visit(this, ast);
-		} else {
-			ast.S1.visit(this, o);
-		}
+		ast.S1.visit(this, o);
 
-		if (ast.S2 instanceof BreakStmt || ast.S2 instanceof ContinueStmt) {
-			ast.S2.visit(this, ast);
-		} else {
-			ast.S2.visit(this, o);
-		}
+		ast.S2.visit(this, o);
 
 		return null;
 	}
 
 	@Override
 	public Object visitWhileStmt(WhileStmt ast, Object o) {
-		Type ifExprType = (Type) ast.E.type.visit(this, null);
-		if (!ifExprType.isBooleanType()) {
-				reporter.reportError(errMesg[20] + ": ", null, ast.E.position);
+		Type whileExprType = (Type) ast.E.visit(this, null);
+		if (!whileExprType.isBooleanType()) {
+				reporter.reportError(errMesg[21] + ": ", null, ast.E.position);
 		}
 
-		if (ast.S instanceof BreakStmt || ast.S instanceof ContinueStmt) {
-			ast.S.visit(this, ast);
-		} else {
-			ast.S.visit(this, o);
-		}
+		ast.S.visit(this, o);
 
 		return null;
 	}
 
 	@Override
 	public Object visitForStmt(ForStmt ast, Object o) {
-		Type ifExprType = (Type) ast.E2.type.visit(this, null);
-		if (!ifExprType.isBooleanType()) {
-				reporter.reportError(errMesg[20] + ": ", null, ast.E2.position);
+		Type forExprType = (Type) ast.E2.visit(this, null);
+		if (!forExprType.isBooleanType()) {
+				reporter.reportError(errMesg[22] + ": ", null, ast.E2.position);
 		}
 		
-		if (ast.S instanceof BreakStmt || ast.S instanceof ContinueStmt) {
-			ast.S.visit(this, ast);
-		} else {
-			ast.S.visit(this, o);
-		}
-		
+		ast.S.visit(this, o);
+	
 		return null;
 	}
 
-	@Override
-	public Object visitBreakStmt(BreakStmt ast, Object o) {
-		if (!(o instanceof WhileStmt || o instanceof ForStmt)) {
-			/* TODO: throw error */
+@Override
+public Object visitBreakStmt(BreakStmt ast, Object o) {
+	AST parent = ast.parent;
+	if (!(ast.parent instanceof WhileStmt || ast.parent instanceof ForStmt)) {
+		while (!(parent instanceof CompoundStmt)) {
+			parent = parent.parent;
 		}
-
-		return null;
+		
+		if (!(parent.parent instanceof ForStmt || parent.parent instanceof WhileStmt)) {
+			reporter.reportError(errMesg[23] + ": ", null, ast.position);
+		}
+	}
+	return null;
 	}
 
 	@Override
 	public Object visitContinueStmt(ContinueStmt ast, Object o) {
-		if (!(o instanceof WhileStmt || o instanceof ForStmt)) {
-			/* TODO: throw error */
+		AST parent = ast.parent;
+		if (!(ast.parent instanceof WhileStmt || ast.parent instanceof ForStmt)) {
+			while (!(parent instanceof CompoundStmt)) {
+				parent = parent.parent;
+			}
+			
+			if (!(parent.parent instanceof ForStmt || parent.parent instanceof WhileStmt)) {
+				reporter.reportError(errMesg[24] + ": ", null, ast.position);
+			}
 		}
-
 		return null;
 	}
 
