@@ -171,7 +171,13 @@ public final class Checker implements Visitor {
 
 	public Object visitProgram(Program ast, Object o) {
 		ast.FL.visit(this, null);
-
+		
+		Decl mainDecl = idTable.retrieve("main");
+		if (mainDecl == null) {
+				reporter.reportError(errMesg[0], "", ast.position);
+		} else if (!mainDecl.isFuncDecl()) {
+				reporter.reportError(errMesg[0], "", ast.position);
+		}
 		return null;
 	}
 
@@ -819,6 +825,7 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 	 */
 	public Object visitExprList(ExprList ast, Object o) {
 		ArrayType array = (ArrayType) o;
+		/* FIXME: below is not always true */
 		IntExpr arraySizeExpr = (IntExpr) array.E;
 		Type expectedType = array.T;
 		Type elementType = (Type) ast.E.visit(this, null);
@@ -832,7 +839,7 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 
 	@Override
 	public Object visitArrayExpr(ArrayExpr ast, Object o) {
-		if (!(ast.E instanceof IntExpr)) {
+		if (!(ast.E.visit(this, o) instanceof IntType )) {
 				reporter.reportError(errMesg[17] + ": ", null, ast.E.position);
 		}
 		/* this visits SimpleVar */
@@ -891,7 +898,18 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		while(!al.isEmptyArgList() && !pl.isEmptyParaList()) {
 			Arg arg = ((ArgList) al).A;
 			ParaDecl param = ((ParaList) pl).P; 
-			if (!arg.type.equals(param.T)) {
+			if (arg.type.isArrayType() && param.T.isArrayType()) {
+				Type argArrayType = ((ArrayType) arg.type).T;
+				Type paramArrayType = ((ArrayType) param.T).T;
+				
+				if (argArrayType.equals(paramArrayType)) {
+					return;
+				} else if (argArrayType.isIntType() && paramArrayType.isFloatType()) {
+					return;
+				} else {
+					reporter.reportError(errMesg[27] + ": %", param.I.spelling, argList.position);
+				}
+			} else if (!arg.type.equals(param.T)) {
 				if (arg.type.isIntType() && param.T.isFloatType()) {
 					arg.E = coerceInt(arg.E);
 				} else {
