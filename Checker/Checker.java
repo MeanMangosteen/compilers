@@ -177,6 +177,8 @@ public final class Checker implements Visitor {
 				reporter.reportError(errMesg[0], "", ast.position);
 		} else if (!mainDecl.isFuncDecl()) {
 				reporter.reportError(errMesg[0], "", ast.position);
+		} else if (!mainDecl.T.isIntType()) {
+				reporter.reportError(errMesg[1], "", ast.position);
 		}
 		return null;
 	}
