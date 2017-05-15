@@ -187,12 +187,10 @@ public final class Checker implements Visitor {
 
 	public Object visitCompoundStmt(CompoundStmt ast, Object o) {
 		Object retPresent;
-		idTable.openScope();
 
 		ast.DL.visit(this, o);
 		retPresent = ast.SL.visit(this, o);
 
-		idTable.closeScope();
 		return retPresent;
 	}
 
@@ -278,6 +276,7 @@ public final class Checker implements Visitor {
 		// Your code goes here
 		ast.I.visit(this, null);
 
+		idTable.openScope();
 		ast.PL.visit(this, ast);
 		// HINT
 		// Pass ast as the 2nd argument (as done below) so that the
@@ -290,6 +289,7 @@ public final class Checker implements Visitor {
 					reporter.reportError(errMesg[31] + "", null, ast.position);
 			}
 		}
+		idTable.closeScope();
 
 		return null;
 	}
@@ -583,7 +583,7 @@ public final class Checker implements Visitor {
 	public Object visitWhileStmt(WhileStmt ast, Object o) {
 		Type whileExprType = (Type) ast.E.visit(this, null);
 		if (!whileExprType.isBooleanType()) {
-				reporter.reportError(errMesg[21] + ": ", null, ast.E.position);
+				reporter.reportError(errMesg[22] + ": ", null, ast.E.position);
 		}
 
 		ast.S.visit(this, o);
@@ -594,10 +594,11 @@ public final class Checker implements Visitor {
 	@Override
 	public Object visitForStmt(ForStmt ast, Object o) {
 		Type forExprType = (Type) ast.E2.visit(this, null);
-		if (!forExprType.isBooleanType()) {
-				reporter.reportError(errMesg[22] + ": ", null, ast.E2.position);
+		if (!ast.E2.isEmptyExpr()) {
+			if (!forExprType.isBooleanType()) {
+					reporter.reportError(errMesg[21] + ": ", null, ast.E2.position);
+			}
 		}
-		
 		ast.S.visit(this, o);
 	
 		return null;
@@ -673,7 +674,6 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		/* make expr is scalar */
 		checkScalar(ast.E);
 		/* assign type to current ast */
-		ast.type = t;
 
 		/* determine if type appropriate for unary expression 
 		 * don't need the switch stmt, but there for sanity
@@ -681,14 +681,18 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		switch(ast.O.spelling) {
 		case("+"):
 		case("-"):
+			ast.type = t;
 			if (!(ast.E.type instanceof IntType || 
 					ast.E.type instanceof FloatType)) {
 				reporter.reportError(errMesg[10] + ": %", ast.O.spelling, ast.position);
+				ast.type = StdEnvironment.errorType;
 			}
 			break;
 		case("!"):
+			ast.type = StdEnvironment.booleanType;
 			if (!(ast.E.type instanceof BooleanType)) {
 				reporter.reportError(errMesg[10] + ": %", ast.O.spelling, ast.position);
+				ast.type = StdEnvironment.errorType;
 			}
 			break;
 		default:
@@ -699,26 +703,67 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		return ast.type;
 	}
 
+	boolean checkIntFloatBool(Type t1, Type t2) {
+		if (!(t1.isIntType() || t1.isFloatType() || t1.isBooleanType())) {
+			return false;
+		}
+
+		if (!(t2.isIntType() || t2.isFloatType() || t2.isBooleanType())) {
+			return false;
+		}
+
+		return true;
+	}
 	@Override
 	public Object visitBinaryExpr(BinaryExpr ast, Object o) {
 		Type t1 = (Type) ast.E1.visit(this, null);
 		Type t2 = (Type) ast.E2.visit(this, null);
+		
+		if (t1.isErrorType() || t2.isErrorType()) {
+			ast.type = StdEnvironment.errorType;
+			return ast.type;
+		}
 		
 		checkScalar(ast.E1);
 		checkScalar(ast.E2);
 
 		/* perform type coercion if need to */
 		if (t1.isFloatType() && t2.isIntType()) {
-			ast.E2 = coerceInt(ast.E2);
+			t2 = coerceInt(ast.E2).type;
 		} else if (t2.isFloatType() && t1.isIntType()) {
-			ast.E1 = coerceInt(ast.E1);
+			t1 = coerceInt(ast.E1).type;
 		}
 		/* make sure two types are assignable */
-		if (t1.assignable(t2)) {
-			ast.type = t1;
-		} else {
+		if (!t1.equals(t2) || !checkIntFloatBool(t1, t2)) {
 			reporter.reportError(errMesg[9] + ": %", ast.O.spelling, ast.position);
 			ast.type = StdEnvironment.errorType;
+			return ast.type;
+		}
+		
+		/* at this point all is well, just setting expr type */
+		switch(ast.O.spelling){
+		case "+":
+		case "-":
+		case "*":
+		case "/":
+			if (t1.isFloatType()) {
+				ast.type = StdEnvironment.floatType;
+			} else {
+				ast.type = StdEnvironment.intType;
+			}
+			break;
+		case "!":
+		case "!=":
+		case "=":
+		case "==":
+		case "<":
+		case "<=":
+		case ">":
+		case ">=":
+		case "&&":
+		case "||":
+			ast.type = StdEnvironment.booleanType;
+			break;
 		}
 
 		return ast.type;
@@ -844,26 +889,36 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		if (!(ast.E.visit(this, o) instanceof IntType )) {
 				reporter.reportError(errMesg[17] + ": ", null, ast.E.position);
 		}
-		/* this visits SimpleVar */
+		
+		/* making sure it is in fact a legal variable */
 		ast.type = (Type) ast.V.visit(this, null);
 		SimpleVar arrVar = (SimpleVar) ast.V;
-		if (arrVar == null) { 
-			ast.type = StdEnvironment.errorType;
-		} else {
-			Type arrVarDeclType = (Type) ((Decl) arrVar.I.decl).T;
-			if (arrVar.I.decl instanceof FuncDecl || !arrVarDeclType.isArrayType()) {
-				reporter.reportError(errMesg[12] + ": %", arrVar.I.spelling, arrVar.I.position);
-				ast.type = StdEnvironment.errorType;
-			}
+		if (ast.type.isErrorType()) { 
+			return ast.type;
 		}
-		/* get the expr inside square brackets, i.e arr[expr] */
+
+		Type arrVarDeclType;
+		Decl arrVarDecl = (Decl) arrVar.I.visit(this, null);
+		arrVarDeclType = arrVarDecl.T;
+		
+		/* making sure decl is of array type */
+		if (arrVarDecl instanceof FuncDecl || !arrVarDeclType.isArrayType()) {
+			reporter.reportError(errMesg[12] + ": %", arrVar.I.spelling, arrVar.I.position);
+			ast.type = StdEnvironment.errorType;
+			return ast.type;
+		}
+		
+		/* get the Type of 'ArrayType' */
+		ast.type = (Type) arrVarDeclType.visit(this, null);
+
+		/* visit the expr inside square brackets, i.e arr[expr] */
 		ast.E.visit(this, null);
+
 		return ast.type;
 	}
 
 	@Override
 	public Object visitCallExpr(CallExpr ast, Object o) {
-		FuncDecl fd = (FuncDecl) o;
 		Ident callIdent = ast.I;
 		Decl callIdentDecl = (Decl) ast.I.visit(this, null);
 		
@@ -890,7 +945,8 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		ast.AL.visit(this, null);
 		checkArgTypes(ast.AL, ast.I);
 		
-		return fd.T;
+		ast.type = callIdentDecl.T;
+		return ast.type;
 	}
 	
 	void checkArgTypes(List argList, Ident funcDeclIdent) {
@@ -959,8 +1015,13 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 
 	@Override
 	public Object visitAssignExpr(AssignExpr ast, Object o) {
-		ast.E1.visit(this, o);
-		ast.E2.visit(this, o);
+		Type t1 = (Type) ast.E1.visit(this, o);
+		Type t2 = (Type) ast.E2.visit(this, o);
+		
+		if (t1.isErrorType() || t2.isErrorType()) {
+			ast.type = StdEnvironment.errorType;
+			return ast.type;
+		}
 		
 		/* making sure expression are scalar */
 		checkScalar(ast.E1);
@@ -976,12 +1037,10 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		}
 
 		/* formatting Type for assignment check */
-		Type t1;
-		if (ast.E1 instanceof VarExpr) {
-			t1 = ((VarExpr) ast.E1).type;
-		} else {
-			/* must be ArrayExpr */
-			t1 = ((ArrayType) ((ArrayExpr) ast.E1).type).T;
+
+		if (!(ast.E1 instanceof VarExpr || ast.E1 instanceof ArrayExpr)) {
+			ast.type = StdEnvironment.errorType;
+			return ast.type;
 		}
 
 		/* perform type coercion is need to */
@@ -990,7 +1049,7 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 		}
 
 		/* making sure ident and expr to assing are of same type */
-		if (t1.assignable(ast.E2.type)) { 
+		if (ast.E1.type.assignable(ast.E2.type)) { 
 			ast.type = ast.E1.type;
 		} else {
 			reporter.reportError(errMesg[6] + ": ", null,  ast.position);
@@ -1051,7 +1110,8 @@ public Object visitBreakStmt(BreakStmt ast, Object o) {
 	public Object visitSimpleVar(SimpleVar ast, Object o) {
 		Decl binding = (Decl) visitIdent(ast.I, o);
 		if (binding == null) {
-			return StdEnvironment.errorType;
+			ast.type = StdEnvironment.errorType;
+			return ast.type;
 		} 
 		ast.type = binding.T;
 		return ast.type;
