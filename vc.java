@@ -1,6 +1,5 @@
 /*
- * vc.java        
- * Sun Apr 24 15:57:55 AEST 2016
+ * vc.java           
  * 
  * Jingling Xue, CSE, UNSW, Sydney NSW 2052, Australia.
  */
@@ -15,7 +14,7 @@ import VC.TreeDrawer.Drawer;
 import VC.TreePrinter.Printer;
 import VC.UnParser.UnParser;
 import VC.Checker.Checker;
-import VC.StdEnvironment;
+import VC.CodeGen.Emitter;
 
 public class vc {
 
@@ -26,6 +25,7 @@ public class vc {
     private static Printer printer;
     private static UnParser unparser;
     private static Checker checker; 
+    private static Emitter emitter; 
 
     private static int drawingAST = 0;
     private static boolean printingAST = false;
@@ -161,7 +161,14 @@ public class vc {
           checker.check(theAST);
 
           if (reporter.numErrors == 0) {
-            System.out.println ("Compilation was successful.");
+            System.out.println("Pass 3: Code Generation");
+            System.out.println();
+            emitter = new Emitter(inputFilename, reporter);
+            emitter.gen(theAST);
+            if (reporter.numErrors == 0) 
+              System.out.println ("Compilation was successful.");
+            else
+              System.out.println ("Compilation was unsuccessful.");
           } else
             System.out.println ("Compilation was unsuccessful.");
 
