@@ -188,7 +188,9 @@ public final class Checker implements Visitor {
 	public Object visitCompoundStmt(CompoundStmt ast, Object o) {
 		Object retPresent;
 
-		idTable.openScope();
+		if (!(ast.parent instanceof FuncDecl)) {
+			idTable.openScope();
+		}
 		ast.DL.visit(this, o);
 		retPresent = ast.SL.visit(this, o);
 		idTable.closeScope();
