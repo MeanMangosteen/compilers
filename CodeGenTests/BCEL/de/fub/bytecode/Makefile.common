@@ -1,0 +1,20 @@
+#
+# GNU Makefile
+#
+
+JC	:= jikes
+JFLAGS	:= +E
+SOURCES := $(wildcard *.java)
+CLASSES := $(patsubst %.java,%.class,$(SOURCES))
+
+#
+# New rule for type dependent compilation
+#
+%.class: %.java
+	@rm -f %.class
+	$(JC) $(JFLAGS) $<
+
+all: $(CLASSES)
+
+clean:
+	rm -f core *~ *.class #*#

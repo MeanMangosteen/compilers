@@ -1,0 +1,398 @@
+What's new in 1.1
+-----------------
+
+* Support for JDK 1.1 extensions such as
+	- Synthetic, Deprecated and InnerClasses attributes
+	- ACC_SUPER flag becomes `special'
+
+What's new in 1.1.1
+-------------------
+
+* Support for visitor pattern style programming. Classes that implement
+  the Visitor interface can traverse a Java class from the outside.
+  You could write your own class dumping routine, i.e. your own
+  listclass.java without using the toString() routines, for example. 
+
+What's new in 1.1.3
+-------------------
+ 
+* Mainly bug fixes in Utility.java and LocalVariable.java
+
+What's new in 1.2.0
+-------------------
+ 
+* Some bug fixes/Left out methods
+* Extended getXXX/setXX methods interface
+
+What's new in 1.3.0
+-------------------
+
+* Lots of bug fixes
+* You don't need to call JavaClass.initJavaClass() anymore
+* Class2HTML class added which can convert .class files into HTML
+* Support for zip files
+
+What's new in 1.3.1
+-------------------
+* Bug fixes
+* Made Class2HTML an API
+
+What's new in 2.0
+-----------------
+* Fixed some glitchs
+* Rewrote ByteSequence.java
+* Added ClassGen package
+
+What's new in 2.0.1
+-------------------
+* Bug fixes
+
+What's new in 2.0.2
+-------------------
+* Bug fix for LocalVariableInstruction.initfromFile
+* Bug fix for Type.getType
+* Documentation fixed (IFLE takes one, not two arguments)
+
+What's new in 2.0.3
+-------------------
+* Bug fix for Class2HTML
+
+What's new in 2.1.0
+-------------------
+* Cleaning up of API
+* Support for shallow (clone()) and deep (copy()) object copies
+
+What's new in 2.1.1
+-------------------
+* Bug fixes in Unknown.java (bytes may be null or extremely long)
+* Bug fix in Type.java
+* Enhanced listclass
+
+What's new in 2.1.2
+-------------------
+* Bug fixes in IINC and RET + set/get-Methods
+* Bug fix in Utility.typeOfSignature
+
+What's new in 2.2.0
+-------------------
+* Updated MethodGen API
+* Bug fixes for NEWARRAY, MULTIANEWARRAY
+* Added new hierarchy layers: InvokeInstruction, LoadClass, ReturnInstruction
+
+What's new in 2.2.1
+-------------------
+* Fixed ByteSequence inner class
+* Added helloify.java
+
+What's new in 2.2.2
+-------------------
+* Added JasminVisitor
+* Fixed Constants entries
+
+What's new in 2.3.0
+-------------------
+* Added ClassPath
+* Added InstructionList.redirectXXX()
+* Added FieldGen
+* Some fixes
+* Switched to 1.2 documentation format
+
+What's new in 2.3.1
+-------------------
+* Add convenience methods in Type.java
+* Fix in InnerClass.toString()
+* Close zip files in ClassParser.parse(), too, if any
+
+What's new in 2.4.0
+-------------------
+* Split class Type into BasicType, ArrayType and ObjectType
+* Predefined constants in Type.java
+* Some additional type hierarchies: PushInstruction
+* Minor fixes in Utility.java
+
+What's new in 2.4.1
+-------------------
+* switched to gnu.regexp package
+
+What's new in 2.5.0
+-------------------
+* InstructionList.delete() throws TargetLostException
+* Some fixes in JavaClass
+* New type hierarchies in ClassGen
+* New utility methods
+* added HelloWorldBuilder and Peephole
+* listclass format revised
+
+What's new in 2.5.1
+-------------------
+* Some fixes in JavaClass
+* New interface StringConstant, super class FieldOrMethod
+* Added Repository and utility classes
+* Support for Synthetic attribute
+
+What's new in 2.5.2
+-------------------
+* Functional SWITCH template, keys _always_ need to be sorted, bug fixed
+* Bug fix in Select.updatePosition(), Select.initfromFile()
+* MethodGen checks for native flag
+* consumeStack() and produceStack() now work for all instructions, if you supply
+  a ConstantPoolGen. Thanks to mthies@uni-paderborn.de.
+* Adjusted JavaClass for new major/minor number (46.0)
+
+What's new in 3.0
+-----------------
+* I thought it's time for a new major version number :-)
+* MethodGen now has a method to compute maximum stack size! Thanks to beard@netscape.com.
+* LDC and LDC_W adjust their size according to the size of the index
+* Code attribute does, too. Thanks to rolandpj@bigfoot.com.
+* Got rid off ConstantUnicode
+* Cleaned up ConstantUtf8 (readUtf())
+* Added isPrivate(), isStatic(), ... to fields, classes and methods
+* Cleanup of doc strings
+
+What's new in 3.1
+-----------------
+* packages renamed!! + added renaming script to support this
+* ConstantPoolGen has initial size of 1024 and enlarges itself if necessary
+* Moved position field from Instruction to InstructionHandle
+* InstructionHandle have no public constructor anymore
+* dispose() code rewritten
+* Instruction flyweight objects added to InstructionConstants interface ...
+* Instruction handles will be reused when calling il.dispose()
+
+What's new in 3.1.1
+-------------------
+* Fixed subtle bug in Code.java that caused a wrong length, if it was read 
+  from a file originally 
+
+What's new in 3.1.2
+-------------------
+* Bug fix in Method, Field, FieldOrMethod: attributes.length may be null in toString()
+* JavaClass.instanceOf
+* ClassPath checks CLASSPATH variable and appends the boot path (since 1.2) by default
+* Bug fix in Type.getType()
+* Added InstructionFactory class + THIS to InstructionConstants
+* add addAttribute() to FieldGen
+* Removed deprecated getSlot() from LocalVariable
+* Removed ReferenceType.getNull() because the variable sometimes is not initialized
+  correctly! Don't ask me why, it's a JVM bug.
+
+What's new in 3.2.0
+-------------------
+* Ensured that there may be only singleton basic type objects. Updated Mini therefore.
+* New MethodGen.setMaxLocals() to compute number of locals, not very precise though
+* CodeExceptionGen.catch_type is now of type ObjectType, thus fixed design error
+* ConstantPoolGen.addMethodref(MethodGen), ...
+* FieldGen.getClassName()
+* CPInstruction.getType() and InvokeInstruction.getResultType() ...
+* Added MULTIANEWARRAY.toString(cp)
+
+What's new in 3.2.1
+-------------------
+* New switch -brief for listclass: Omit constant pool indexes
+* MethodGen.stripAttributes(): toggle production of code attributes, like javac -O
+* Added generic.FieldOrMethod as super class of InvokeInstruction and FieldInstruction
+* Rewrote and extended getType(), getName(), etc. of CPInstruction, et.al.
+* rewrote dispose() code
+
+What's new in 3.2.2
+-------------------
+* Switched to LGPL
+* Fix for interfaces and abstract methods in JasminVisitor
+* Typo fix in Utility
+* LocalVariableInstruction.setIndex() fix, removed wide field
+* ClassGen.getInterfaces() and other get/set methods
+* Bug in second constructor of MethodGen when catch_type == 0 fixed
+* Removed/Changed "final" and "private" modifiers
+* Fix in InstructionList(byte[] code): Correct notification for branch targets
+
+What's new in 3.2.3
+-------------------
+* Fix in BranchInstruction and BranchHandle: toString(false) gave funny results, because
+  Instruction.i_position did not alias BranchInstruction.position
+* Check for il != null in MethodGen methods
+* Instruction targeters may contain the same target more than once, update all of them ...
+* ExceptionConstants + ExceptionThrower instructions
+* JasminVisitor output to class in proper directory
+* Escape special characters in constantToString(), e.g. \n 
+
+What's new in 3.2.4
+-------------------
+* Additional check in InstructionList.setPositions(true) whether BranchInstructions
+  are contained in BranchHandles properly
+* InvokeInstructions are ExceptionThrowers, too, and so are LDIV and LREM
+
+What's new in 3.2.5
+-------------------
+* Some small fixes and additional checks
+* Repository/ClassPath gives more information about a class file, e.g. modification time
+* FieldGen(Field) constructor, removed redundant class_name parameter
+* JavaClass.dump creates necessary directories automatically
+
+What's new in 3.2.6
+-------------------
+* Instruction handles may have attributes associated with them
+* JavaClass has getSource() which returns either HEAP, FILE, or ZIP
+
+What's new in 3.2.7
+-------------------
+* Fix in ArrayType
+* ih.getPosition() public
+* Other fixes I forgot :)
+* java.ext.dir in ClassPath
+
+What's new in 3.3.0
+-------------------
+* Documentation fixes
+* Fix in ConstantPoolGen: lookup table was not set up correctly in constructor
+* Small changes to Mini
+
+What's new in 3.3.1
+-------------------
+* Rewrote ClassPath.getClassPath()
+* ConstantPoolGen uses explicit delimiters
+
+What's new in 3.3.2
+-------------------
+* added hashcode() for ArrayType and ObjectType
+* Fixed documentation "i.e." flaws
+
+What's new in 3.3.3
+-------------------
+* Fixed .end method flaw in JasminVisitor
+* ConstantValue now escapes special characters like " to \"
+* getExceptions() fixed
+* get/set for minor/major version in ClassGen
+* Fixed typo bug in LocalVariableGen setEnd()
+
+What's new in 4.0.0
+-------------------
+* Renamed JavaClass to Byte Code Engineering Library due to legal issues with Sun
+* Added InstructionList.getInstructions()
+* Made Instruction.readInstruction() public
+
+What's new in 4.0.1
+-------------------
+* Added TypedInstruction, StackProducer and StackConsumer interfaces
+* Fixed some typos
+* ClassGen.setClassName() changes name in constant pool
+
+What's new in 4.1.0
+-------------------
+* Added StoreInstruction, LoadInstruction
+* Docu fixes in ALOAD, ...
+* Added Visitor functionality for instructions (and handles)
+
+What's new in 4.1.1
+-------------------
+* Added Observer functionality for fields, methods and instruction lists
+* Don't let everybody implement Constants where its not useful
+* Moved duplicate code from FieldGen and MethodGen into the new FieldGenOrMethodGen
+
+What's new in 4.2.0
+-------------------
+* Some fixes
+* Added NamedAndTyped
+* ClassGen.addInterface rewritten
+* ConstantPoolGen removed deprecated calls
+* FieldGen.initValue rewritten, added toString
+* InstructionList: fixed getPositions() to return array of proper length
+* Removed ReferenceType.toString()
+* Moved towards SourceForge ...
+
+What's new in 4.2.1
+-------------------
+* Added IndexedInstruction
+* InstructionList.move()
+* Repository.removeClass()
+* LDC.getValue()
+* Some clone() methods
+* ClassGen.replaceXX()
+* MethodGen.removeXX()
+* Fix for MethodGen.setMaxLocals()
+
+What's new in 4.2.2
+-------------------
+* Fix for fix for MethodGen.setMaxLocals(), hope it works now!
+* IINC, RET are TypedInstruction's
+* Type.RETURNADDRESS (for JSR/RET)
+* ConstantObject, resp. getConstantValue()
+* Fixed InstructionList.copy(), obviously nobody used it yet ...
+* Added InstructionList.replaceConstantPool
+* Added ConstantPoolGen.addConstant to import constants from other cps
+* Fixed Utilty.getSignature()
+
+What's new in 4.2.3
+-------------------
+* Fix for InstructionList.copy()
+* Added MethodGen.copy(), FieldGen.copy()
+* Fix for TABLESWITCH.dump()
+* Enhancement for Instruction.copy()
+
+What's new in 4.2.4
+-------------------
+* JsrInstruction (= StackProducer) added
+* JsrInstruction successor
+* Some smaller fixes, and typos
+* Added jar target Manifest
+* Changed Web address
+
+What's new in 4.2.5
+-------------------
+* _final_ fields may have an initial value not just static fields
+* Cache for Utf8 constants in ConstantPoolGen
+* Changes to make BCEL JDK1.1 compliant again
+* Fix for Instruction.copy causing NullPointer
+
+What's new in 4.3.0
+-------------------
+* New example Package.java, thanks to First Hop Ltd / Torsten Rueger
+* Better support for GJ signatures
+* Added Node interface to denote visitable classes
+* Possibility to obtain nth predecessor in DefaultVisitor
+* Deprecated de.fub.bytecode.classfile.DefaultVisitor in favor
+  of de.fub.bytecode.classfile.DescendingVisitor.
+* Deprecated de.fub.bytecode.generic.DefaultVisitor in favor
+  of de.fub.bytecode.classfile.EmptyVisitor.
+* Added package.html files
+* Added StackMap attribute (J2ME attribute, unfinished code)
+* IMPORTANT: Fixed CodeExceptionGen in that the end_pc is interpreted
+  as inclusive opposed to the CodeException in the classfile package where
+  it is exclusive.
+  This rarely matters, but would otherwise prevent us from using the very last
+  instruction as an end_pc. It also is a cleaner solution.
+* LoadInstruction,StoreInstruction become classes
+* visitCompoundInstruction, visitCodeConstraint, visitInstructionTargeter removed
+
+What's new in 4.3.1
+-------------------
+
+* Check for proper index in getConstant()
+* Method.toString() prints variable names, if available
+* Use Apache license instead of MPL, more widely accepted
+* Finished StackMap attribute (J2ME attribute, untested) for MIDP code
+
+What's new in 4.3.2
+-------------------
+* Added some convenience methods for constants
+* IINC as LocalVariableInstruction
+* Enhanced support for StackMap, cleaner output
+* Added createPrintln() to InstructionFactory
+* Deprecated INVOKEINTERFACE.getNoArgs() in favor of getCount()
+* New MIDP and other constants in Constants.java
+
+What's new in 4.4.0
+-------------------
+* Utility.methodSignatureToString() supplies default names
+* MethodGen.getArgNames() deprecated
+* Added ClassLoader, JavaWrapper together with ProxyCreator example
+* Second constructor of MethodGen modified slightly, hope it still works
+* Bug fix in first constructor of MethodGen
+* Bug fix for IINC
+
+What's new in 4.4.1
+-------------------
+* Improved ProxyCreator/ClassLoader to allow package names
+* Enhanced listclass by Thomas Wheeler
+* MethodGen.getMethod() can be called multiply
+* Allow other Code attributes in MethodGen, in particular StackMap

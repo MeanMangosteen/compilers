@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+
+<!-- ===================================================================
+
+   Build file for bcel
+
+Notes:
+   This is a build file for use with the Jakarta Ant build tool.
+
+Prerequisites:
+
+   jakarta-ant from http://jakarta.apache.org
+
+Build Instructions:
+   To build, run
+
+     java org.apache.tools.ant.Main <target>
+
+   on the directory where this file is located with the target you want.
+
+Most useful targets:
+
+ - compile  -> compile classes package in "./${build.dir}/classes"
+ - jar      -> jar the classes to "${build.lib}/${name}.jar"
+ - javadocs -> creates the javadocs in "./${build.dir}/javadocs"
+ - dist     -> creates the complete binary distribution
+
+Authors:
+
+  David Li <david@d11e.com>
+
+Copyright:
+  Copyright 2000 (c) DigitalSesame 
+
+   $Id: build.xml,v 1.2 2001/10/04 10:28:54 dahm Exp $
+
+==================================================================== -->
+
+<project default="jar" basedir=".">
+
+  <target name="init">
+    <property name="name" value="bcel"/>
+    <property name="Name" value="BCEL"/>
+    <property name="version" value="2.1B1"/>
+    <property name="year" value="2000"/>
+
+    <property name="debug" value="off"/>
+
+    <property name="src.dir" value="."/>
+    <property name="docs.dir" value="./docs"/>
+
+    <property name="packages" value="de.*,gnu.*"/>
+
+    <property name="build.file" value="build.xml"/>
+    <property name="build.dir" value="./ant.build"/>
+    <property name="build.dest" value="./${build.dir}/classes"/>
+    <property name="build.lib" value="./${build.dir}/lib"/>
+    <property name="build.javadocs" value="./${build.dir}/javadocs"/>
+
+    <property name="dist.dir" value="./${Name}-${version}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Prepares the build directory                                        -->
+  <!-- =================================================================== -->
+  <target name="prepare" depends="init">
+    <mkdir dir="${build.dir}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Compiles the source directory                                       -->
+  <!-- =================================================================== -->
+  <target name="compile" depends="prepare">
+    <mkdir dir="${build.dest}"/>
+    <copy todir="${build.dest}">
+      <fileset dir="${src.dir}" includes="gnu/**"/>
+    </copy>
+    <javac srcdir="${src.dir}" 
+           destdir="${build.dest}" 
+           debug="${debug}"
+           excludes="${build.dir}/**"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Jar the library                                                     -->
+  <!-- =================================================================== -->
+  <target name="jar" depends="compile">
+    <mkdir dir="${build.lib}"/>
+    <jar jarfile="${build.lib}/${name}.jar" 
+         basedir="${build.dest}"/>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates the API documentation                                       -->
+  <!-- =================================================================== -->
+  <target name="javadocs" depends="prepare">
+    <mkdir dir="${build.javadocs}"/>
+    <javadoc packagenames="${packages}"
+             sourcepath="${src.dir}"
+             destdir="${build.javadocs}"
+             author="true"
+             version="true"
+             use="true"
+             windowtitle="${Name} API"
+             doctitle="${Name}"
+    />
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Creates the binary distribution                                          
+  -->
+  <!-- =================================================================== -->
+  <target name="dist" depends="jar, javadocs">
+    <mkdir dir="${dist.dir}"/>
+    <mkdir dir="${dist.dir}/docs"/>
+    <mkdir dir="${dist.dir}/docs/apiDocs"/>
+    <mkdir dir="${dist.dir}/lib"/>
+
+    <copy todir="${dist.dir}/docs/apiDocs">
+     <fileset dir="${build.javadocs}"/>
+    </copy>
+    <copy todir="${dist.dir}/docs">
+      <fileset dir="${src.dir}" includes="*.txt *.html"/>
+    </copy>
+    <copy todir="${dist.dir}/lib">
+      <fileset dir="${build.lib}"/>
+    </copy>
+  </target>
+
+  <!-- =================================================================== -->
+  <!-- Cleans everything                                                   -->
+  <!-- =================================================================== -->
+  <target name="clean" depends="init">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+</project>
