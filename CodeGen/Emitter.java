@@ -777,6 +777,140 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitBinaryExpr(BinaryExpr ast, Object o) {
+		Frame frame = (Frame) o;
+		String op = ast.O.spelling;
+		
+		ast.E1.visit(this, o);
+		ast.E2.visit(this, o);
+		
+		/* the operands are already on the stack */
+		if (op.equals("i+")) {
+			emit(JVM.IADD);
+		} else if (op.equals("i-")) {
+			emit(JVM.ISUB);
+		} else if (op.equals("f+")) {
+			emit(JVM.FADD);
+		} else if (op.equals("f-")) {
+			emit(JVM.FSUB);
+		} else if (op.equals("f*")) {
+			emit(JVM.FMUL);
+		} else if (op.equals("i*")) {
+			emit(JVM.IMUL);
+		} else if (op.equals("f/")) {
+			emit(JVM.FDIV);
+		} else if (op.equals("i/")) {
+			emit(JVM.IDIV);
+		} else if (op.equals("f>")) {
+			/* TODO: with all these comparisons below operator might eval for 2nd
+			 * expr instead of first, check spec, this seems to be the case, need test
+			 */
+
+			/* greater label */
+			String gLabel = frame.getNewLabel();
+			/* emits a 1 or -1 */
+			emit(JVM.FCMPG);
+			/* greater so go label and emit 1 */
+			emit(JVM.IFGT, gLabel);
+			/* less than so emit 0 */
+			emit(JVM.ICONST_0);
+			/* graeter label emit 1 */
+			emit(gLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("f>=")) {
+			/* get label -> label returns 1*/
+			String geLabel = frame.getNewLabel();
+			/* check if equal, go to label */
+			emit(JVM.FCMPG);
+			/* check if greater or equal */
+			emit(JVM.IFGE, geLabel);
+			/* less than so emit 0 */
+			emit(JVM.ICONST_0);
+			/* emit label */
+			emit(geLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("f<")) {
+			/* lesser label */
+			String lLabel = frame.getNewLabel();
+			/* emits a 1 or -1 */
+			emit(JVM.FCMPG);
+			/* lesser so go lavel and emit 1 */
+			emit(JVM.IFLT, lLabel);
+			/* greater so emit 0 */
+			emit(JVM.ICONST_0);
+			/* lesser label emit 1 */
+			emit(lLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("f<=")) {
+			/* lesser equal label */
+			String leLabel = frame.getNewLabel();
+			/* emits a 1 or -1 */
+			emit(JVM.FCMPG);
+			/* lesser so go lavel and emit 1 */
+			emit(JVM.IFLE, leLabel);
+			/* greater so emit 0 */
+			emit(JVM.ICONST_0);
+			/* lesser equal label emit 1 */
+			emit(leLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("f==")) {
+			String eqLabel = frame.getNewLabel();
+			/* this will return 0 if equal */
+			emit(JVM.FCMPG);
+			/* check if equal to 0 */
+			emit(JVM.IFEQ, eqLabel);
+			/* not equal to 0 emit false (0) */
+			emit(JVM.ICONST_0);
+			/* equal label emit 1 (true) */
+			emit(eqLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if(op.equals("f!=")) {
+			/* just the reverse of == */
+			String neLabel = frame.getNewLabel();
+			emit(JVM.FCMPG);
+			emit(JVM.IFNE, neLabel);
+			emit(JVM.ICONST_0);
+			emit(neLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("i>")) {
+			String gLabel = frame.getNewLabel();
+			emit(JVM.IF_ICMPGT, gLabel);
+			emit(JVM.ICONST_0);
+			emit(gLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("i>=")) {
+			String geLabel = frame.getNewLabel();
+			emit(JVM.IF_ICMPGE, geLabel);
+			emit(JVM.ICONST_0);
+			emit(geLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("i<")) {
+			String lLabel = frame.getNewLabel();
+			emit(JVM.IF_ICMPLT, lLabel);
+			emit(JVM.ICONST_0);
+			emit(lLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("i<=")) {
+			String leLabel = frame.getNewLabel();
+			emit(JVM.IF_ICMPLE, leLabel);
+			emit(JVM.ICONST_0);
+			emit(leLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if (op.equals("i==")) {
+			String eqLabel = frame.getNewLabel();
+			emit(JVM.IF_ICMPEQ, eqLabel);
+			emit(JVM.ICONST_0);
+			emit(eqLabel + ":");
+			emit(JVM.ICONST_1);
+		} else if(op.equals("i!=")) {
+			String neLabel = frame.getNewLabel();
+			emit(JVM.IF_ICMPNE, neLabel);
+			emit(JVM.ICONST_0);
+			emit(neLabel + ":");
+			emit(JVM.ICONST_0);
+		}
+
+
+
 		// TODO Auto-generated method stub
 		return null;
 	}
