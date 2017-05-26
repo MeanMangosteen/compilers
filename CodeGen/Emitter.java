@@ -795,6 +795,10 @@ public final class Emitter implements Visitor {
 		Frame frame = (Frame) o;
 		String startLabel = frame.getNewLabel();
 		String doneLabel = frame.getNewLabel();
+		
+		/* push labels on to corresponding stacks */
+		frame.conStack.push(startLabel);
+		frame.brkStack.push(doneLabel);
 				
 		emit(startLabel + ":");
 		/* push 1 or 0 onto stack */
@@ -806,6 +810,10 @@ public final class Emitter implements Visitor {
 		emit(JVM.GOTO, startLabel);
 		/* come here on 'while' expr fail */
 		emit(doneLabel + ":");
+		/* pop break and continue labels */
+		frame.conStack.pop();
+		frame.brkStack.pop();
+
 		return null;
 	}
 
@@ -813,8 +821,13 @@ public final class Emitter implements Visitor {
 	public Object visitForStmt(ForStmt ast, Object o) {
 		Frame frame = (Frame) o;
 		String startLabel = frame.getNewLabel();
+		String incrementLabel = frame.getNewLabel();
 		String doneLabel = frame.getNewLabel();
 		
+		/* push labels on to corresponding stacks */
+		frame.conStack.push(incrementLabel);
+		frame.brkStack.push(doneLabel);
+
 		/* perform 'for' initialisation */
 		ast.E1.visit(this, o);
 		emit(startLabel + ":");
@@ -825,25 +838,38 @@ public final class Emitter implements Visitor {
 		/* 'for' expr is true, perform 'for' body */
 		ast.S.visit(this, o);
 		/* perform increment step */
+		emit(incrementLabel + ":");
 		ast.E3.visit(this, o);
 		/* loop back to start */
 		emit(JVM.GOTO, startLabel);
-		
 		/* come here after 'while' cond fail */
 		emit(doneLabel + ":");
+		/* pop break and continue labels */
+		frame.conStack.pop();
+		frame.brkStack.pop();
 
 		return null;
 	}
+	
+	/* TODO: go through all lecture slides and make sure
+	 * all examples are covered, e.g. compound assignment
+	 */
 
 	@Override
 	public Object visitBreakStmt(BreakStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		/* get the done label from parent loop */
+		String doneLabel = frame.brkStack.peek();
+		emit(JVM.GOTO, doneLabel);
+
 		return null;
 	}
 
 	@Override
 	public Object visitContinueStmt(ContinueStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		String startLabel = frame.conStack.peek();
+		emit(JVM.GOTO, startLabel);
 		return null;
 	}
 
@@ -902,8 +928,10 @@ public final class Emitter implements Visitor {
 
 			/* check both expr are true */
 			ast.E1.visit(this, o);
+			frame.pop();
 			emit(JVM.IFEQ, failLabel);
 			ast.E2.visit(this, o);
+			frame.pop();
 			emit(JVM.IFEQ, failLabel);
 
 			/* both are true so load 'true' onto stack */
@@ -916,14 +944,18 @@ public final class Emitter implements Visitor {
 
 			/* come here after loading 1 or 0 onto stack */
 			emit(doneLabel + ":");
+			frame.push();
+			return null;
 		} else if (op.equals("i||")) {
 			String successLabel = frame.getNewLabel();
 			String doneLabel = frame.getNewLabel();
 			
 			/* check if either expr are true */
 			ast.E1.visit(this, o);
+			frame.pop();
 			emit(JVM.IFNE, successLabel);
 			ast.E2.visit(this, o);
+			frame.pop();
 			emit(JVM.IFNE, successLabel);
 			
 			/* both expr are false */
@@ -936,6 +968,8 @@ public final class Emitter implements Visitor {
 
 			/* come here are loading 1 or 0 onto stack */
 			emit(doneLabel + ":");
+			frame.push();
+			return null;
 		}
 		
 		/* push both expr on to stack */
