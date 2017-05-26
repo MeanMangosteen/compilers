@@ -792,7 +792,20 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitWhileStmt(WhileStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		String startLabel = frame.getNewLabel();
+		String doneLabel = frame.getNewLabel();
+				
+		emit(startLabel + ":");
+		/* push 1 or 0 onto stack */
+		ast.E.visit(this, o);
+		/* check if 'while' expr is true */
+		emit(JVM.IFEQ, doneLabel);
+		/* expr is true perform while body and loop back */
+		ast.S.visit(this, o);
+		emit(JVM.GOTO, startLabel);
+		/* come here on 'while' expr fail */
+		emit(doneLabel + ":");
 		return null;
 	}
 
@@ -903,8 +916,6 @@ public final class Emitter implements Visitor {
 
 			/* come here are loading 1 or 0 onto stack */
 			emit(doneLabel + ":");
-		} else if (op.equals("i!")) {
-			
 		}
 		
 		/* push both expr on to stack */
