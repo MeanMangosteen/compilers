@@ -111,7 +111,8 @@ public final class Emitter implements Visitor {
 		emit("; set limits used by this method");
 		emit(JVM.LIMIT, "locals", frame.getNewIndex());
 
-		emit(JVM.LIMIT, "stack", frame.getMaximumStackSize());
+		// emit(JVM.LIMIT, "stack", frame.getMaximumStackSize());
+		emit(JVM.LIMIT, "stack", 50);
 		emit(JVM.RETURN);
 		emit(JVM.METHOD_END, "method");
 
@@ -212,7 +213,7 @@ public final class Emitter implements Visitor {
 	public Object visitCallExpr(CallExpr ast, Object o) {
 		Frame frame = (Frame) o;
 		String fname = ast.I.spelling;
-
+		
 		if (fname.equals("getInt")) {
 			ast.AL.visit(this, o); // push args (if any) into the op stack
 			emit("invokestatic VC/lang/System.getInt()I");
@@ -402,7 +403,8 @@ public final class Emitter implements Visitor {
 		emit("; set limits used by this method");
 		emit(JVM.LIMIT, "locals", frame.getNewIndex());
 
-		emit(JVM.LIMIT, "stack", frame.getMaximumStackSize());
+		//emit(JVM.LIMIT, "stack", frame.getMaximumStackSize());
+		emit(JVM.LIMIT, "stack", 50);
 		emit(".end method");
 
 		return null;
@@ -420,6 +422,7 @@ public final class Emitter implements Visitor {
 
 		emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " " + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
 
+		/* if there is a expr after decl then store it */
 		if (!ast.E.isEmptyExpr()) {
 			ast.E.visit(this, o);
 
@@ -546,6 +549,22 @@ public final class Emitter implements Visitor {
 	// Variables 
 
 	public Object visitSimpleVar(SimpleVar ast, Object o) {
+		Frame frame = (Frame) o;
+		Ident i = (Ident) ast.I;
+		Decl d = (Decl) i.decl;
+		
+		if (ast.type.isIntType() || ast.type.isBooleanType()) {
+			emitILOAD(d.index);
+		} else if (ast.type.isFloatType()) {
+			emitFLOAD(d.index);
+		} else if (ast.type.isStringType()) {
+			/* TODO: emitALOAD(d.index) */
+		} else {
+			throw new AssertionError("did not get an int, bool, float, or string");
+		}
+		
+		frame.push();
+
 		return null;
 	}
 
@@ -651,16 +670,28 @@ public final class Emitter implements Visitor {
 		else
 			emit(JVM.FLOAD, index); 
 	}
+	
+	/* TODO: ALOAD */
 
 	private void emitGETSTATIC(String T, String I) {
 		emit(JVM.GETSTATIC, classname + "/" + I, T); 
+	}
+	
+	private void emitASTORE(Ident ast) {
+		int index;
+		if (ast.decl instanceof ParaDecl)
+			index = ((ParaDecl) ast.decl).index; 
+		else
+			index = ((LocalVarDecl) ast.decl).index; 
+		
+		emit(JVM.ASTORE, index);
 	}
 
 	private void emitISTORE(Ident ast) {
 		int index;
 		if (ast.decl instanceof ParaDecl)
 			index = ((ParaDecl) ast.decl).index; 
-		else
+		else  /* TODO: would this also work global var ? */
 			index = ((LocalVarDecl) ast.decl).index; 
 
 		if (index >= 0 && index <= 3) 
@@ -765,13 +796,44 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitExprStmt(ExprStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		ast.E.visit(this, o);
 		return null;
 	}
 
 	@Override
 	public Object visitUnaryExpr(UnaryExpr ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		String op = ast.O.spelling;
+
+		/* push expr onto stack */
+		ast.E.visit(this, o);
+		
+		if (op.equals("i!")) {
+			String falseLabel = frame.getNewLabel();
+			String doneLabel = frame.getNewLabel();
+			
+			/* check if expr is true or false */
+			emit(JVM.IFEQ, falseLabel);
+			
+			/* expr is true*/
+			emit(JVM.ICONST_0);
+			emit(JVM.GOTO, doneLabel);
+			
+			/* expr is false */
+			emit(falseLabel + ":");
+			emit(JVM.ICONST_1);
+			
+			/* come here after loading 1 or 0 */
+			emit(doneLabel + ":");
+		} else if (op.equals("i+")) {
+			/* TODO: confirm we nothing ? */
+		} else if (op.equals("i-")) {
+			/* pop stack, negate, push back on */
+			frame.pop();
+			emit(JVM.INEG);
+			frame.push();
+		}
+
 		return null;
 	}
 
@@ -780,27 +842,88 @@ public final class Emitter implements Visitor {
 		Frame frame = (Frame) o;
 		String op = ast.O.spelling;
 		
+		if (op.equals("i&&")) {
+			String failLabel = frame.getNewLabel();
+			String doneLabel = frame.getNewLabel();
+
+			/* check both expr are true */
+			ast.E1.visit(this, o);
+			emit(JVM.IFEQ, failLabel);
+			ast.E2.visit(this, o);
+			emit(JVM.IFEQ, failLabel);
+
+			/* both are true so load 'true' onto stack */
+			emit(JVM.ICONST_1);
+			emit(JVM.GOTO, doneLabel);
+
+			/* one or both expr are false */
+			emit(failLabel + ":");
+			emit(JVM.ICONST_0);
+
+			/* come here after loading 1 or 0 onto stack */
+			emit(doneLabel + ":");
+		} else if (op.equals("i||")) {
+			String successLabel = frame.getNewLabel();
+			String doneLabel = frame.getNewLabel();
+			
+			/* check if either expr are true */
+			ast.E1.visit(this, o);
+			emit(JVM.IFNE, successLabel);
+			ast.E2.visit(this, o);
+			emit(JVM.IFNE, successLabel);
+			
+			/* both expr are false */
+			emit(JVM.ICONST_0);
+			emit(JVM.GOTO, doneLabel);
+			
+			/* one or both expr are true */
+			emit(successLabel + ":");
+			emit(JVM.ICONST_1);
+
+			/* come here are loading 1 or 0 onto stack */
+			emit(doneLabel + ":");
+		} else if (op.equals("i!")) {
+			
+		}
+		
+		/* push both expr on to stack */
 		ast.E1.visit(this, o);
 		ast.E2.visit(this, o);
 		
 		/* the operands are already on the stack */
 		/* TODO: pushing and popping of the frame */
 		if (op.equals("i+")) {
+			frame.pop(2);
 			emit(JVM.IADD);
+			frame.push();
 		} else if (op.equals("i-")) {
+			frame.pop(2);
 			emit(JVM.ISUB);
+			frame.push();
 		} else if (op.equals("f+")) {
+			frame.pop(2);
 			emit(JVM.FADD);
+			frame.push();
 		} else if (op.equals("f-")) {
+			frame.pop(2);
 			emit(JVM.FSUB);
+			frame.push();
 		} else if (op.equals("f*")) {
+			frame.pop(2);
 			emit(JVM.FMUL);
+			frame.push();
 		} else if (op.equals("i*")) {
+			frame.pop(2);
 			emit(JVM.IMUL);
+			frame.push();
 		} else if (op.equals("f/")) {
+			frame.pop(2);
 			emit(JVM.FDIV);
+			frame.push();
 		} else if (op.equals("i/")) {
+			frame.pop(2);
 			emit(JVM.IDIV);
+			frame.push();
 		} else if (op.charAt(0) == 'f') {
 			emitFCMP(op, frame);
 		} else if (op.charAt(0) == 'i') {
@@ -831,13 +954,38 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitVarExpr(VarExpr ast, Object o) {
-		// TODO Auto-generated method stub
+		ast.V.visit(this, o);
 		return null;
 	}
 
 	@Override
 	public Object visitAssignExpr(AssignExpr ast, Object o) {
-		// TODO Auto-generated method stub
+		/* put whatever RHS expr onto stack */
+		ast.E2.visit(this, o);
+		
+		/* get index for LHS variable */
+		Ident i = null;
+		if (ast.E1 instanceof VarExpr) {
+			VarExpr ve = (VarExpr) ast.E1;
+			SimpleVar var = (SimpleVar) ve.V;
+			i = var.I;
+		} else {
+			System.out.println("we should always get var for lhs?");
+			System.exit(0);
+		}
+
+		/* TODO: ARrays 
+		 */
+		if (ast.type.isIntType() || ast.type.isBooleanType()) {
+			emitISTORE(i);
+		} else if (ast.type.isFloatType()) {
+			emitFSTORE(i);
+		} else if (ast.type.isStringType()) {
+			emitASTORE(i);
+		}
+		/* put whatever was on stack into LHS var */
+
+		
 		return null;
 	}
 
