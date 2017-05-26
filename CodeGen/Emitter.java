@@ -766,7 +766,27 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitIfStmt(IfStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		String failLabel = frame.getNewLabel();
+		String doneLabel = frame.getNewLabel();
+
+		/* push 'if' expr on to stack */
+		ast.E.visit(this, o);
+		
+		/* check if 'if' expr is true */
+		emit(JVM.IFEQ, failLabel);
+		/* expr is true, visit body of if */
+		ast.S1.visit(this, o);
+		/* skip the else's */
+		emit(JVM.GOTO, doneLabel);
+
+		/* expr not true, visit supplementary condition (if any) */
+		emit(failLabel + ":" );
+		ast.S2.visit(this, o);
+		
+		/* come here after conditional */
+		emit(doneLabel + ":");
+		
 		return null;
 	}
 
@@ -805,6 +825,7 @@ public final class Emitter implements Visitor {
 		Frame frame = (Frame) o;
 		String op = ast.O.spelling;
 
+		/* TODO: test short circuit  for boolean  */
 		/* push expr onto stack */
 		ast.E.visit(this, o);
 		
