@@ -811,7 +811,27 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitForStmt(ForStmt ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		String startLabel = frame.getNewLabel();
+		String doneLabel = frame.getNewLabel();
+		
+		/* perform 'for' initialisation */
+		ast.E1.visit(this, o);
+		emit(startLabel + ":");
+		/* push 0 or 1 onto stack */
+		ast.E2.visit(this, o);
+		/* check if 'for' expr is false */
+		emit(JVM.IFEQ, doneLabel);
+		/* 'for' expr is true, perform 'for' body */
+		ast.S.visit(this, o);
+		/* perform increment step */
+		ast.E3.visit(this, o);
+		/* loop back to start */
+		emit(JVM.GOTO, startLabel);
+		
+		/* come here after 'while' cond fail */
+		emit(doneLabel + ":");
+
 		return null;
 	}
 
