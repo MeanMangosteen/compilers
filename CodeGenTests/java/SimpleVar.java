@@ -5,9 +5,9 @@ public class SimpleVar{
 		SimpleVar vc$;
 		vc$ = new SimpleVar();
 
-		Integer i = 1;
+		float i = 1.0F;
+		boolean j = i == 0.5F;
 
-		Integer j = i + 1;
 
 		return;
 	}
