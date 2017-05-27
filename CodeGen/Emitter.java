@@ -95,6 +95,7 @@ public final class Emitter implements Visitor {
 		while (!list.isEmpty()) {
 			DeclList dlAST = (DeclList) list;
 			if (dlAST.D instanceof GlobalVarDecl) {
+				
 				GlobalVarDecl vAST = (GlobalVarDecl) dlAST.D;
 				/* special case for arrays */
 				if (vAST.T.isArrayType()) {
@@ -205,7 +206,17 @@ public final class Emitter implements Visitor {
 			emit(JVM.RETURN);
 			return null;
 		}
-		return frame;
+		
+		ast.E.visit(this, o);
+		
+		if (ast.E.type.isIntType() || ast.E.type.isBooleanType()) {
+			emit(JVM.IRETURN);
+		} else if (ast.E.type.isFloatType()) {
+			emit(JVM.FRETURN);
+		} else  {
+			throw new AssertionError("visitReturnStmt: need int, bool, or float");
+		}
+		return null;
 
 		// TODO
 		// Your other code goes here
@@ -1205,7 +1216,11 @@ public final class Emitter implements Visitor {
 			SimpleVar var = (SimpleVar) ve.V;
 			i = var.I;
 
-			if (ast.type.isIntType() || ast.type.isBooleanType()) {
+			String varType = globals.get(i.spelling);
+			/* check if we're dealing with a global variable */
+			if (varType != null) {
+				emitPUTSTATIC(varType, i.spelling);
+			} else if (ast.type.isIntType() || ast.type.isBooleanType()) {
 				frame.pop();
 				emitISTORE(i);
 			} else if (ast.type.isFloatType()) {
