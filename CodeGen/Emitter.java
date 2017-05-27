@@ -420,11 +420,38 @@ public final class Emitter implements Visitor {
 		ast.index = frame.getNewIndex();
 		String T = VCtoJavaType(ast.T);
 
-		emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " " + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
+
+		/* TODO: figure out this sceop Start business */
+		if (ast.T.isArrayType()) {
+			ArrayType at = (ArrayType) ast.T;
+			/* get the actual type if an array */
+			Type actualArrayType = at.T;
+			/* convert it to assemble appropriate string */
+			T = VCtoJavaType(actualArrayType);
+			/* assembly var decl */
+			emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " [" + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
+			/* emit array size */
+			at.E.visit(this, o);
+			/* emit array obj refercne */
+			frame.push();
+			emit(JVM.NEWARRAY, VCtoArrayType(at));
+			if (!ast.E.isEmptyExpr()) {
+				/* store initialised stuff */
+				ast.E.visit(this, o);
+			}
+			/* store obj ref in array variable */
+			frame.pop();
+			emit(JVM.ASTORE, ast.index);
+			return null;
+
+		} else 
+			emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " " + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
 
 		/* if there is a expr after decl then store it */
 		if (!ast.E.isEmptyExpr()) {
-			ast.E.visit(this, o);
+			if (!ast.T.isArrayType())  {
+				ast.E.visit(this, o);
+			}
 
 			if (ast.T.equals(StdEnvironment.floatType)) {
 				// cannot call emitFSTORE(ast.I) since this I is not an
@@ -434,7 +461,7 @@ public final class Emitter implements Visitor {
 				else
 					emit(JVM.FSTORE, ast.index); 
 				frame.pop();
-			} else {
+			} else if (ast.T.equals(StdEnvironment.intType)) {
 				// cannot call emitISTORE(ast.I) since this I is not an
 				// applied occurrence 
 				if (ast.index >= 0 && ast.index <= 3) 
@@ -442,6 +469,7 @@ public final class Emitter implements Visitor {
 				else
 					emit(JVM.ISTORE, ast.index); 
 				frame.pop();
+			} else if (ast.T.isArrayType()) {
 			}
 		}
 
@@ -757,6 +785,18 @@ public final class Emitter implements Visitor {
 		else // if (t.equals(StdEnvironment.voidType))
 			return "V";
 	}
+	
+	private String VCtoArrayType(Type t) {
+		Type actualArrayType = ((ArrayType) t).T;
+		if (actualArrayType.equals(StdEnvironment.booleanType))
+			return JVM.BOOLEAN;
+		else if (actualArrayType.equals(StdEnvironment.intType))
+			return JVM.INT;
+		else if (actualArrayType.equals(StdEnvironment.floatType))
+			return JVM.FLOAT;
+		else 
+			throw new AssertionError("should only get boolean int or float for array type");
+	}
 
 	@Override
 	public Object visitEmptyExprList(EmptyExprList ast, Object o) {
@@ -1022,7 +1062,28 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitInitExpr(InitExpr ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		List l =  ast.IL;
+		Integer sizeCounter = 0;
+		
+		while (!l.isEmpty()) {
+			ExprList el = (ExprList) l;
+			/* duplicate the array obj ref */
+			frame.push();
+			emit(JVM.DUP);
+			/* emit index at which to store */
+			frame.push();
+			emitICONST(sizeCounter);
+			/* emit value which we want to store */
+			el.E.visit(this, o);
+			/* store instrcution */
+			frame.pop(3);
+			emit(JVM.IASTORE);
+			/* feed the iteration */
+			/* TODO: will this always be true */
+			l = el.EL;
+			sizeCounter++;
+		}
 		return null;
 	}
 
@@ -1034,7 +1095,21 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitArrayExpr(ArrayExpr ast, Object o) {
-		// TODO Auto-generated method stub
+		Frame frame = (Frame) o;
+		SimpleVar sv = (SimpleVar) ast.V;
+		Integer varIndex = ((Decl) sv.I.decl).index;
+
+		/* load obj ref onto stack */
+		frame.push();
+		emit(JVM.ALOAD, varIndex);
+		/* load index to store at */
+		ast.E.visit(this, o);
+		/* if not lhs in assignment, load value onto stack */
+		if (!(ast.parent instanceof AssignExpr)) {
+			frame.pop(2);
+			emit(JVM.IALOAD);
+			frame.push();
+		}
 		return null;
 	}
 
@@ -1046,30 +1121,43 @@ public final class Emitter implements Visitor {
 
 	@Override
 	public Object visitAssignExpr(AssignExpr ast, Object o) {
+		Frame frame = (Frame) o;
+
+		/* special case if array */
+		if (ast.E1 instanceof ArrayExpr) {
+			/* put index and obj ref on stack */
+			ast.E1.visit(this, o);
+			/* put whatever RHS expr onto stack */
+			ast.E2.visit(this, o);
+			/* actual store instuction */
+			frame.pop(3);
+			emit(JVM.IASTORE);
+
+			return null;
+		}
+
 		/* put whatever RHS expr onto stack */
 		ast.E2.visit(this, o);
-		
 		/* get index for LHS variable */
 		Ident i = null;
 		if (ast.E1 instanceof VarExpr) {
 			VarExpr ve = (VarExpr) ast.E1;
 			SimpleVar var = (SimpleVar) ve.V;
 			i = var.I;
+
+			if (ast.type.isIntType() || ast.type.isBooleanType()) {
+				frame.pop();
+				emitISTORE(i);
+			} else if (ast.type.isFloatType()) {
+				frame.pop();
+				emitFSTORE(i);
+			}
+
 		} else {
 			System.out.println("we should always get var for lhs?");
 			System.exit(0);
 		}
 
-		/* TODO: ARrays 
-		 */
-		if (ast.type.isIntType() || ast.type.isBooleanType()) {
-			emitISTORE(i);
-		} else if (ast.type.isFloatType()) {
-			emitFSTORE(i);
-		} else if (ast.type.isStringType()) {
-			emitASTORE(i);
-		}
-		/* put whatever was on stack into LHS var */
 
 		
 		return null;
