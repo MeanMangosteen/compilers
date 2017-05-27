@@ -96,21 +96,23 @@ public final class Emitter implements Visitor {
 			DeclList dlAST = (DeclList) list;
 			if (dlAST.D instanceof GlobalVarDecl) {
 				GlobalVarDecl vAST = (GlobalVarDecl) dlAST.D;
+				/* special case for arrays */
+				if (vAST.T.isArrayType()) {
+					/* emit array size */
+					ArrayType at = (ArrayType) vAST.T;
+					at.E.visit(this, frame);
+					/* emit array obj refercne */
+					frame.push();
+					emit(JVM.NEWARRAY, VCtoArrayType(at));
+					/* set type for init expression */
+					vAST.E.type = at.T;
+				}
 				if (!vAST.E.isEmptyExpr()) {
-					/* special case for arrays */
-					if (vAST.T.isArrayType()) {
-						/* emit array size */
-						ArrayType at = (ArrayType) vAST.T;
-						at.E.visit(this, frame);
-						/* emit array obj refercne */
-						frame.push();
-						emit(JVM.NEWARRAY, VCtoArrayType(at));
-					}
 					vAST.E.visit(this, frame);
 				} else {
 					if (vAST.T.equals(StdEnvironment.floatType))
 						emit(JVM.FCONST_0);
-					else
+					else if (!vAST.T.isArrayType())
 						emit(JVM.ICONST_0);
 					frame.push();
 				}
@@ -450,6 +452,8 @@ public final class Emitter implements Visitor {
 			frame.push();
 			emit(JVM.NEWARRAY, VCtoArrayType(at));
 			if (!ast.E.isEmptyExpr()) {
+				/* set type for init Expr */
+				ast.E.type = actualArrayType;
 				/* store initialised stuff */
 				ast.E.visit(this, o);
 			}
@@ -1106,7 +1110,15 @@ public final class Emitter implements Visitor {
 			el.E.visit(this, o);
 			/* store instrcution */
 			frame.pop(3);
-			emit(JVM.IASTORE);
+			if (ast.type.isIntType()) {
+				emit(JVM.IASTORE);
+			} else if (ast.type.isBooleanType()) {
+				emit(JVM.BASTORE);
+			} else if (ast.type.isFloatType()) {
+				emit(JVM.FASTORE);
+			} else {
+				throw new AssertionError("visitInitExpr: expect int, boolean, float type");
+			}
 			/* feed the iteration */
 			/* TODO: will this always be true */
 			l = el.EL;
@@ -1142,8 +1154,10 @@ public final class Emitter implements Visitor {
 		if (!(ast.parent instanceof AssignExpr)) {
 			/* TODO: type check it won't always be ints, do floats and bools */
 			frame.pop(2);
-			if (ast.type.isIntType() || ast.type.isBooleanType()) {
+			if (ast.type.isIntType()) {
 				emit(JVM.IALOAD);
+			} else if (ast.type.isBooleanType()) {
+				emit(JVM.BALOAD);
 			} else  {
 				emit(JVM.FALOAD);
 			}
@@ -1171,8 +1185,10 @@ public final class Emitter implements Visitor {
 			ast.E2.visit(this, o);
 			/* actual store instuction */
 			frame.pop(3);
-			if (ast.type.isIntType() || ast.type.isBooleanType()) {
+			if (ast.type.isIntType()) {
 				emit(JVM.IASTORE);
+			} else if (ast.type.isBooleanType()) {
+				emit(JVM.BASTORE);
 			} else  {
 				emit(JVM.FASTORE);
 			}
