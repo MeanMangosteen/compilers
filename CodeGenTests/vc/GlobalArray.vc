@@ -1,0 +1,26 @@
+int a[] = {1, 2, 3};
+float b[2];
+boolean c[] = {true};
+
+int main() {
+	
+	int i;
+
+	b[0] = 3.1;
+
+	for (i=0; i<2; i=1+i) {
+		putFloatLn(b[i]);
+	}
+
+	for (i=0;i<3;i=i+1) {
+		putIntLn(a[i]);
+	}
+
+	a[2] = 4;
+
+	for (i=0;i<3;i=i+1) {
+		putIntLn(a[i]);
+	}
+
+	return 0;
+}

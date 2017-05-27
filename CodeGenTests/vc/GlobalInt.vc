@@ -1,0 +1,7 @@
+int i = 3;
+int main() {
+	
+	putIntLn(i);
+
+	return 0;
+}

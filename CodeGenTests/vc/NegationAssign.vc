@@ -1,0 +1,9 @@
+int main() {
+
+	boolean i = true;
+	boolean j;
+
+	j = !i;
+
+	return 0;
+}

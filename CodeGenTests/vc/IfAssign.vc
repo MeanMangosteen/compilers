@@ -1,0 +1,37 @@
+int main() {
+	
+	int i;
+	boolean j = false;
+
+	if (true) {
+		i = 1;
+	} else if (true) {
+		i = 2;
+	} else {
+		i = 3;
+	}
+
+	putIntLn(i);
+
+	if (j) {
+		i = 1;
+	} else if (true) {
+		i = 2;
+	} else {
+		i = 3;
+	}
+
+	putIntLn(i);
+
+	if (j) {
+		i = 1;
+	} else if (j) {
+		i = 2;
+	} else {
+		i = 3;
+	}
+
+	putIntLn(i);
+
+	return 0;
+}

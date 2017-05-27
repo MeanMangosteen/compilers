@@ -1,0 +1,19 @@
+int main() {
+	
+	int i;
+	int a[] = {1, 2, 3};
+	boolean b[5];
+	float c[8];
+
+	for (i=0;i<3;i=i+1) {
+		putIntLn(a[i]);
+	}
+
+	a[2] = 4;
+
+	for (i=0;i<3;i=i+1) {
+		putIntLn(a[i]);
+	}
+
+	return 0;
+}

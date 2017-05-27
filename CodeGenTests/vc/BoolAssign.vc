@@ -1,0 +1,7 @@
+int main() {
+	
+	boolean i = true && true;
+	putBoolLn(i);
+
+	return 0;
+}

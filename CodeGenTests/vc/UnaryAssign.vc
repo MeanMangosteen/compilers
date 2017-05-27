@@ -1,0 +1,21 @@
+int main() {
+
+	int a = 1;
+	int b;
+	int c;
+
+	boolean i = true;
+	boolean j;
+	
+	/* int stuff */	
+	b = +a;
+	putIntLn(b);
+	c = -a;
+	putIntLn(c);
+
+	/* negation stuff */
+	j = !i;
+	putBoolLn(j);
+
+	return 0;
+}

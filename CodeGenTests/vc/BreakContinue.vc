@@ -1,0 +1,19 @@
+int main() {
+	int i = 0;
+	while (i != 10) {
+		putIntLn(i);
+		if (i == 5 ) {
+			break;
+		}
+		i = i + 1;
+	}
+
+	for (i=0; i<=10; i=1+i) {
+		if ((i == 2) || (i == 3)) {
+			continue;
+		}
+		putIntLn(i);
+	}
+
+	return 0;
+}

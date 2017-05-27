@@ -1,0 +1,4 @@
+int main() {
+	putStringLn("hello world!");
+	return 0;
+}
