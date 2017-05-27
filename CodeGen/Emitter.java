@@ -14,6 +14,7 @@ package VC.CodeGen;
 
 import java.util.LinkedList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.ListIterator;
 
 import VC.ASTs.*;
@@ -26,6 +27,9 @@ public final class Emitter implements Visitor {
 	private String inputFilename;
 	private String classname;
 	private String outputFilename;
+   // tells if string is a global variable
+   // hashmap<varName, jasminType>
+   HashMap<String, String> globals = new HashMap<String, String>();
 
 	public Emitter(String inputFilename, ErrorReporter reporter) {
 		this.inputFilename = inputFilename;
@@ -93,6 +97,15 @@ public final class Emitter implements Visitor {
 			if (dlAST.D instanceof GlobalVarDecl) {
 				GlobalVarDecl vAST = (GlobalVarDecl) dlAST.D;
 				if (!vAST.E.isEmptyExpr()) {
+					/* special case for arrays */
+					if (vAST.T.isArrayType()) {
+						/* emit array size */
+						ArrayType at = (ArrayType) vAST.T;
+						at.E.visit(this, frame);
+						/* emit array obj refercne */
+						frame.push();
+						emit(JVM.NEWARRAY, VCtoArrayType(at));
+					}
 					vAST.E.visit(this, frame);
 				} else {
 					if (vAST.T.equals(StdEnvironment.floatType))
@@ -102,6 +115,7 @@ public final class Emitter implements Visitor {
 					frame.push();
 				}
 				emitPUTSTATIC(VCtoJavaType(vAST.T), vAST.I.spelling); 
+				globals.put(vAST.I.spelling, VCtoJavaType(vAST.T));
 				frame.pop();
 			}
 			list = dlAST.DL;
@@ -544,7 +558,8 @@ public final class Emitter implements Visitor {
 
 	public Object visitIntLiteral(IntLiteral ast, Object o) {
 		Frame frame = (Frame) o;
-		emitICONST(Integer.parseInt(ast.spelling));
+		Integer i = Integer.parseInt(ast.spelling);
+		emitICONST(i);
 		frame.push();
 		return null;
 	}
@@ -581,7 +596,11 @@ public final class Emitter implements Visitor {
 		Ident i = (Ident) ast.I;
 		Decl d = (Decl) i.decl;
 		
-		if (ast.type.isIntType() || ast.type.isBooleanType()) {
+		String globalVarType = globals.get(ast.I.spelling);
+		/* if entry exists in globals hashmap then it's a global var */
+		if (globalVarType != null) {
+			this.emitGETSTATIC(globalVarType, ast.I.spelling);
+		} else if (ast.type.isIntType() || ast.type.isBooleanType()) {
 			emitILOAD(d.index);
 		} else if (ast.type.isFloatType()) {
 			emitFLOAD(d.index);
@@ -776,14 +795,23 @@ public final class Emitter implements Visitor {
 	}
 
 	private String VCtoJavaType(Type t) {
+		String ret = ""; 
+		
+		if (t.isArrayType()) {
+			ret = "[";
+			t = ((ArrayType) t).T;
+		}
+
 		if (t.equals(StdEnvironment.booleanType))
-			return "Z";
+			ret += "Z";
 		else if (t.equals(StdEnvironment.intType))
-			return "I";
+			ret += "I";
 		else if (t.equals(StdEnvironment.floatType))
-			return "F";
+			ret += "F";
 		else // if (t.equals(StdEnvironment.voidType))
-			return "V";
+			ret += "V";
+		
+		return ret;
 	}
 	
 	private String VCtoArrayType(Type t) {
@@ -1097,17 +1125,28 @@ public final class Emitter implements Visitor {
 	public Object visitArrayExpr(ArrayExpr ast, Object o) {
 		Frame frame = (Frame) o;
 		SimpleVar sv = (SimpleVar) ast.V;
-		Integer varIndex = ((Decl) sv.I.decl).index;
-
-		/* load obj ref onto stack */
-		frame.push();
-		emit(JVM.ALOAD, varIndex);
+		
+		String globalArrayType = globals.get(sv.I.spelling);
+		if (globalArrayType != null) {
+			frame.push();
+			this.emitGETSTATIC(globalArrayType, sv.I.spelling);
+		} else {
+			Integer varIndex = ((Decl) sv.I.decl).index;
+			/* load obj ref onto stack */
+			frame.push();
+			emit(JVM.ALOAD, varIndex);
+		}
 		/* load index to store at */
 		ast.E.visit(this, o);
 		/* if not lhs in assignment, load value onto stack */
 		if (!(ast.parent instanceof AssignExpr)) {
+			/* TODO: type check it won't always be ints, do floats and bools */
 			frame.pop(2);
-			emit(JVM.IALOAD);
+			if (ast.type.isIntType() || ast.type.isBooleanType()) {
+				emit(JVM.IALOAD);
+			} else  {
+				emit(JVM.FALOAD);
+			}
 			frame.push();
 		}
 		return null;
@@ -1122,6 +1161,7 @@ public final class Emitter implements Visitor {
 	@Override
 	public Object visitAssignExpr(AssignExpr ast, Object o) {
 		Frame frame = (Frame) o;
+		/* TODO: assignment for global variables */
 
 		/* special case if array */
 		if (ast.E1 instanceof ArrayExpr) {
@@ -1131,7 +1171,11 @@ public final class Emitter implements Visitor {
 			ast.E2.visit(this, o);
 			/* actual store instuction */
 			frame.pop(3);
-			emit(JVM.IASTORE);
+			if (ast.type.isIntType() || ast.type.isBooleanType()) {
+				emit(JVM.IASTORE);
+			} else  {
+				emit(JVM.FASTORE);
+			}
 
 			return null;
 		}
