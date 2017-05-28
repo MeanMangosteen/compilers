@@ -213,8 +213,6 @@ public final class Emitter implements Visitor {
 			emit(JVM.IRETURN);
 		} else if (ast.E.type.isFloatType()) {
 			emit(JVM.FRETURN);
-		} else  {
-			throw new AssertionError("visitReturnStmt: need int, bool, or float");
 		}
 		return null;
 
@@ -306,22 +304,28 @@ public final class Emitter implements Visitor {
 			StringBuffer argsTypes = new StringBuffer("");
 			List fpl = fAST.PL;
 			while (! fpl.isEmpty()) {
-				if (((ParaList) fpl).P.T.equals(StdEnvironment.booleanType))
-					argsTypes.append("Z");         
-				else if (((ParaList) fpl).P.T.equals(StdEnvironment.intType))
-					argsTypes.append("I");         
-				else
-					argsTypes.append("F");         
+				argsTypes.append(VCtoJavaType(((ParaList) fpl).P.T));
 				fpl = ((ParaList) fpl).PL;
 			}
 
 			emit("invokevirtual", classname + "/" + fname + "(" + argsTypes + ")" + retType);
-			frame.pop(argsTypes.length() + 1);
+
+			frame.pop(argCount(argsTypes) + 1);
 
 			if (! retType.equals("V"))
 				frame.push();
 		}
 		return null;
+	}
+	
+	private Integer argCount(StringBuffer s) {
+		int count = 0;
+		for (int i=0; i<s.length(); i++) {
+			if (s.charAt(i) != '[') {
+				count++;
+			}
+		}
+		return count;
 	}
 
 	public Object visitEmptyExpr(EmptyExpr ast, Object o) {
@@ -396,12 +400,7 @@ public final class Emitter implements Visitor {
 			StringBuffer argsTypes = new StringBuffer("");
 			List fpl = ast.PL;
 			while (! fpl.isEmpty()) {
-				if (((ParaList) fpl).P.T.equals(StdEnvironment.booleanType))
-					argsTypes.append("Z");         
-				else if (((ParaList) fpl).P.T.equals(StdEnvironment.intType))
-					argsTypes.append("I");         
-				else
-					argsTypes.append("F");         
+				argsTypes.append(VCtoJavaType(((ParaList) fpl).P.T));
 				fpl = ((ParaList) fpl).PL;
 			}
 
@@ -456,7 +455,8 @@ public final class Emitter implements Visitor {
 			/* convert it to assemble appropriate string */
 			T = VCtoJavaType(actualArrayType);
 			/* assembly var decl */
-			emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " [" + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
+			emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " [" + T + " from "
+			+ (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
 			/* emit array size */
 			at.E.visit(this, o);
 			/* emit array obj refercne */
@@ -518,7 +518,18 @@ public final class Emitter implements Visitor {
 		ast.index = frame.getNewIndex();
 		String T = VCtoJavaType(ast.T);
 
-		emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " " + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
+		if (ast.T.isArrayType()) {
+			ArrayType at = (ArrayType) ast.T;
+			/* get the actual type if an array */
+			Type actualArrayType = at.T;
+			/* convert it to assemble appropriate string */
+			T = VCtoJavaType(actualArrayType);
+			/* assembly var decl */
+			emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " [" + T + " from "
+			+ (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
+		} else {
+			emit(JVM.VAR + " " + ast.index + " is " + ast.I.spelling + " " + T + " from " + (String) frame.scopeStart.peek() + " to " +  (String) frame.scopeEnd.peek());
+		}
 		return null;
 	}
 
@@ -619,10 +630,10 @@ public final class Emitter implements Visitor {
 			emitILOAD(d.index);
 		} else if (ast.type.isFloatType()) {
 			emitFLOAD(d.index);
-		} else if (ast.type.isStringType()) {
-			/* TODO: emitALOAD(d.index) */
+		} else if (ast.type.isArrayType()) {
+			emit(JVM.ALOAD, d.index);
 		} else {
-			throw new AssertionError("did not get an int, bool, float, or string");
+			throw new AssertionError("did not get an int, bool, float, or string. got " + "ident: " + i.spelling + " of type: " + VCtoJavaType(ast.type));
 		}
 		
 		frame.push();
@@ -857,6 +868,7 @@ public final class Emitter implements Visitor {
 		ast.E.visit(this, o);
 		
 		/* check if 'if' expr is true */
+		frame.pop();
 		emit(JVM.IFEQ, failLabel);
 		/* expr is true, visit body of if */
 		ast.S1.visit(this, o);
@@ -887,6 +899,7 @@ public final class Emitter implements Visitor {
 		/* push 1 or 0 onto stack */
 		ast.E.visit(this, o);
 		/* check if 'while' expr is true */
+		frame.pop();
 		emit(JVM.IFEQ, doneLabel);
 		/* expr is true perform while body and loop back */
 		ast.S.visit(this, o);
@@ -917,6 +930,7 @@ public final class Emitter implements Visitor {
 		/* push 0 or 1 onto stack */
 		ast.E2.visit(this, o);
 		/* check if 'for' expr is false */
+		frame.pop();
 		emit(JVM.IFEQ, doneLabel);
 		/* 'for' expr is true, perform 'for' body */
 		ast.S.visit(this, o);
@@ -976,6 +990,7 @@ public final class Emitter implements Visitor {
 			String doneLabel = frame.getNewLabel();
 			
 			/* check if expr is true or false */
+			frame.pop();
 			emit(JVM.IFEQ, falseLabel);
 			
 			/* expr is true*/
@@ -988,6 +1003,7 @@ public final class Emitter implements Visitor {
 			
 			/* come here after loading 1 or 0 */
 			emit(doneLabel + ":");
+			frame.push();
 		} else if (op.equals("i+")) {
 			/* TODO: confirm we nothing ? */
 		} else if (op.equals("i-")) {
@@ -1164,18 +1180,24 @@ public final class Emitter implements Visitor {
 		/* load index to store at */
 		ast.E.visit(this, o);
 		/* if not lhs in assignment, load value onto stack */
-		if (!(ast.parent instanceof AssignExpr)) {
-			/* TODO: type check it won't always be ints, do floats and bools */
-			frame.pop(2);
-			if (ast.type.isIntType()) {
-				emit(JVM.IALOAD);
-			} else if (ast.type.isBooleanType()) {
-				emit(JVM.BALOAD);
-			} else  {
-				emit(JVM.FALOAD);
+		if (ast.parent instanceof AssignExpr) {
+			AssignExpr e = (AssignExpr) ast.parent;
+			if (e.E1.equals(ast)) {
+				return null;
 			}
-			frame.push();
 		}
+		
+		/* load expr on to stack */
+		frame.pop(2);
+		if (ast.type.isIntType()) {
+			emit(JVM.IALOAD);
+		} else if (ast.type.isBooleanType()) {
+			emit(JVM.BALOAD);
+		} else  {
+			emit(JVM.FALOAD);
+		}
+
+		frame.push();
 		return null;
 	}
 
