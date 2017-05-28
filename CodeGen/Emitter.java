@@ -613,7 +613,7 @@ public final class Emitter implements Visitor {
 		
 		String globalVarType = globals.get(ast.I.spelling);
 		/* if entry exists in globals hashmap then it's a global var */
-		if (globalVarType != null) {
+		if (d.index == 0 && globalVarType != null) {
 			this.emitGETSTATIC(globalVarType, ast.I.spelling);
 		} else if (ast.type.isIntType() || ast.type.isBooleanType()) {
 			emitILOAD(d.index);
@@ -1148,9 +1148,11 @@ public final class Emitter implements Visitor {
 	public Object visitArrayExpr(ArrayExpr ast, Object o) {
 		Frame frame = (Frame) o;
 		SimpleVar sv = (SimpleVar) ast.V;
-		
+		Decl arrayDecl = (Decl) sv.I.decl;
 		String globalArrayType = globals.get(sv.I.spelling);
-		if (globalArrayType != null) {
+
+		/* determing if array is global or local */
+		if (arrayDecl.index == 0 && globalArrayType != null) {
 			frame.push();
 			this.emitGETSTATIC(globalArrayType, sv.I.spelling);
 		} else {
@@ -1194,6 +1196,11 @@ public final class Emitter implements Visitor {
 			ast.E1.visit(this, o);
 			/* put whatever RHS expr onto stack */
 			ast.E2.visit(this, o);
+			/* special case if parent is assign expr */
+			if (ast.parent instanceof AssignExpr) {
+				frame.push();
+				emit(JVM.DUP_X2);
+			}
 			/* actual store instuction */
 			frame.pop(3);
 			if (ast.type.isIntType()) {
@@ -1209,16 +1216,24 @@ public final class Emitter implements Visitor {
 
 		/* put whatever RHS expr onto stack */
 		ast.E2.visit(this, o);
+		
+		/* special case if parent is assign expr */
+		if (ast.parent instanceof AssignExpr) {
+			frame.push();
+			emit(JVM.DUP);
+		}
+
 		/* get index for LHS variable */
 		Ident i = null;
 		if (ast.E1 instanceof VarExpr) {
 			VarExpr ve = (VarExpr) ast.E1;
 			SimpleVar var = (SimpleVar) ve.V;
 			i = var.I;
+			Decl varDecl = (Decl) i.decl;
 
 			String varType = globals.get(i.spelling);
 			/* check if we're dealing with a global variable */
-			if (varType != null) {
+			if (varDecl.index == 0 && varType != null) {
 				emitPUTSTATIC(varType, i.spelling);
 			} else if (ast.type.isIntType() || ast.type.isBooleanType()) {
 				frame.pop();
