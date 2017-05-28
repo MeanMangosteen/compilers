@@ -1,0 +1,28 @@
+int j = 2;
+int k[3];
+
+int main() {
+		
+	int i[4];
+	{
+		int i;
+		int j;
+		int k;
+
+		i = j = k = 5;
+		putIntLn(i);
+		putIntLn(j);
+		putIntLn(k);
+	}
+	putIntLn(j);
+
+	i[1] = j = k[2] = i[3] = 5;
+	
+	putIntLn(i[0]);
+	putIntLn(i[1]);
+	putIntLn(i[3]);
+	putIntLn(j);
+	putIntLn(k[2]);
+
+	return 0;
+}

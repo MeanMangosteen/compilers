@@ -1,0 +1,10 @@
+void f(float i[]) {
+	putFloatLn(i[0]);
+	return;
+}
+
+int main() {
+	float j[] = {2.1, 5.6};
+	f(j);
+	return 0;
+}

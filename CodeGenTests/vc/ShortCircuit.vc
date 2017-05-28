@@ -1,0 +1,8 @@
+boolean f() {
+	putBool(false);
+	return false;
+}
+int main() {
+	false && f();
+	return 0;
+}
